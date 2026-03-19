@@ -26,6 +26,7 @@
 #include "pet/PetSpriteRenderer.h"
 #include "activities/tools/WeatherActivity.h"
 #include "util/LunarCalendar.h"
+#include "util/MoonPhase.h"
 #include "util/StringUtils.h"
 
 #include <HalPowerManager.h>
@@ -633,15 +634,11 @@ void SleepActivity::renderClockSleepScreen() const {
     snprintf(dateBuf, sizeof(dateBuf), "%s", tr(STR_SYNC_TIME));
   }
 
-  // Vietnamese lunar date
+  // Moon phase
   char lunarBuf[40] = "";
   if (timeValid) {
-    LunarDate lunar = solarToLunar(timeinfo.tm_mday, timeinfo.tm_mon + 1, timeinfo.tm_year + 1900);
-    if (lunar.isLeapMonth) {
-      snprintf(lunarBuf, sizeof(lunarBuf), "Ngày %d tháng nhuận %d ÂL", lunar.day, lunar.month);
-    } else {
-      snprintf(lunarBuf, sizeof(lunarBuf), "Ngày %d tháng %d ÂL", lunar.day, lunar.month);
-    }
+    MoonPhaseInfo moon = getMoonPhase(timeinfo.tm_mday, timeinfo.tm_mon + 1, timeinfo.tm_year + 1900);
+    snprintf(lunarBuf, sizeof(lunarBuf), "%s", moon.name);
   }
 
   // Calendar month header
@@ -671,15 +668,19 @@ void SleepActivity::renderClockSleepScreen() const {
     char autoCity[32] = "";
     if (WeatherActivity::loadWeatherCache(wData, wCity, wTime, sizeof(wTime),
                                           autoCity, sizeof(autoCity))) {
-      // Use autoCity for Auto mode (wCity=0), otherwise use manual city name
-      const char* cityName = (wCity == 0 && autoCity[0]) ? autoCity
-                             : WeatherActivity::CITIES[wCity < WeatherActivity::CITY_COUNT ? wCity : 0].name;
-      snprintf(weatherLine, sizeof(weatherLine), "%s: %.0f%s  %s  %d%%",
-               cityName,
-               WeatherActivity::convertTemp(wData.temperature),
-               WeatherActivity::tempUnitSuffix(),
-               WeatherActivity::weatherCodeToString(wData.weatherCode),
-               wData.humidity);
+      const char* unit = WeatherActivity::tempUnitSuffix();
+      if (wData.hasTodayHighLow) {
+        snprintf(weatherLine, sizeof(weatherLine), "%.0f%s (H:%.0f L:%.0f)  %s",
+                 WeatherActivity::convertTemp(wData.temperature), unit,
+                 WeatherActivity::convertTemp(wData.todayHigh),
+                 WeatherActivity::convertTemp(wData.todayLow),
+                 WeatherActivity::weatherCodeToString(wData.weatherCode));
+      } else {
+        snprintf(weatherLine, sizeof(weatherLine), "%.0f%s  %s  %d%%",
+                 WeatherActivity::convertTemp(wData.temperature), unit,
+                 WeatherActivity::weatherCodeToString(wData.weatherCode),
+                 wData.humidity);
+      }
       weatherLineH = renderer.getLineHeight(SMALL_FONT_ID) + 4;
     }
   }

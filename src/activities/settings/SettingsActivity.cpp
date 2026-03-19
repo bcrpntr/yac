@@ -33,27 +33,35 @@ void SettingsActivity::onEnter() {
   for (const auto& setting : getSettingsList()) {
     if (setting.category == StrId::STR_NONE_OPT) continue;
     if (setting.category == StrId::STR_CAT_DISPLAY) {
-      displaySettings.push_back(setting);
+      displaySettings.push_back(&setting);
     } else if (setting.category == StrId::STR_CAT_READER) {
-      readerSettings.push_back(setting);
+      readerSettings.push_back(&setting);
     } else if (setting.category == StrId::STR_CAT_CONTROLS) {
-      controlsSettings.push_back(setting);
+      controlsSettings.push_back(&setting);
     } else if (setting.category == StrId::STR_CAT_SYSTEM) {
-      systemSettings.push_back(setting);
+      systemSettings.push_back(&setting);
     }
     // Web-only categories (KOReader Sync, OPDS Browser) are skipped for device UI
   }
 
-  // Append device-only ACTION items
-  controlsSettings.insert(controlsSettings.begin(),
-                          SettingInfo::Action(StrId::STR_REMAP_FRONT_BUTTONS, SettingAction::RemapFrontButtons));
-  systemSettings.push_back(SettingInfo::Action(StrId::STR_WIFI_NETWORKS, SettingAction::Network));
-  systemSettings.push_back(SettingInfo::Action(StrId::STR_KOREADER_SYNC, SettingAction::KOReaderSync));
-  systemSettings.push_back(SettingInfo::Action(StrId::STR_OPDS_BROWSER, SettingAction::OPDSBrowser));
-  systemSettings.push_back(SettingInfo::Action(StrId::STR_CLEAR_READING_CACHE, SettingAction::ClearCache));
-  systemSettings.push_back(SettingInfo::Action(StrId::STR_CHECK_UPDATES, SettingAction::CheckForUpdates));
-  systemSettings.push_back(SettingInfo::Action(StrId::STR_LANGUAGE, SettingAction::Language));
-  readerSettings.push_back(SettingInfo::Action(StrId::STR_CUSTOMISE_STATUS_BAR, SettingAction::CustomiseStatusBar));
+  // Device-only ACTION items — static so pointers remain valid across onEnter() calls
+  static const SettingInfo actionRemapFront = SettingInfo::Action(StrId::STR_REMAP_FRONT_BUTTONS, SettingAction::RemapFrontButtons);
+  static const SettingInfo actionNetwork = SettingInfo::Action(StrId::STR_WIFI_NETWORKS, SettingAction::Network);
+  static const SettingInfo actionKOReader = SettingInfo::Action(StrId::STR_KOREADER_SYNC, SettingAction::KOReaderSync);
+  static const SettingInfo actionOPDS = SettingInfo::Action(StrId::STR_OPDS_BROWSER, SettingAction::OPDSBrowser);
+  static const SettingInfo actionClearCache = SettingInfo::Action(StrId::STR_CLEAR_READING_CACHE, SettingAction::ClearCache);
+  static const SettingInfo actionCheckUpdates = SettingInfo::Action(StrId::STR_CHECK_UPDATES, SettingAction::CheckForUpdates);
+  static const SettingInfo actionLanguage = SettingInfo::Action(StrId::STR_LANGUAGE, SettingAction::Language);
+  static const SettingInfo actionStatusBar = SettingInfo::Action(StrId::STR_CUSTOMISE_STATUS_BAR, SettingAction::CustomiseStatusBar);
+
+  controlsSettings.insert(controlsSettings.begin(), &actionRemapFront);
+  systemSettings.push_back(&actionNetwork);
+  systemSettings.push_back(&actionKOReader);
+  systemSettings.push_back(&actionOPDS);
+  systemSettings.push_back(&actionClearCache);
+  systemSettings.push_back(&actionCheckUpdates);
+  systemSettings.push_back(&actionLanguage);
+  readerSettings.push_back(&actionStatusBar);
 
   // Reset selection to first category
   selectedCategoryIndex = 0;
@@ -144,7 +152,7 @@ void SettingsActivity::toggleCurrentSetting() {
     return;
   }
 
-  const auto& setting = (*currentSettings)[selectedSetting];
+  const auto& setting = *(*currentSettings)[selectedSetting];
 
   if (setting.type == SettingType::TOGGLE && setting.valuePtr != nullptr) {
     // Toggle the boolean value using the member pointer
@@ -221,7 +229,7 @@ void SettingsActivity::render(RenderLock&&) {
   const auto& metrics = UITheme::getInstance().getMetrics();
 
   GUI.drawHeader(renderer, Rect{0, metrics.topPadding, pageWidth, metrics.headerHeight}, tr(STR_SETTINGS_TITLE),
-                 CROSSPOINT_VERSION);
+                 YAC_VERSION);
 
   std::vector<TabInfo> tabs;
   tabs.reserve(categoryCount);
@@ -238,9 +246,9 @@ void SettingsActivity::render(RenderLock&&) {
            pageHeight - (metrics.topPadding + metrics.headerHeight + metrics.tabBarHeight + metrics.buttonHintsHeight +
                          metrics.verticalSpacing * 2)},
       settingsCount, selectedSettingIndex - 1,
-      [&settings](int index) { return std::string(I18N.get(settings[index].nameId)); }, nullptr, nullptr,
+      [&settings](int index) { return std::string(I18N.get(settings[index]->nameId)); }, nullptr, nullptr,
       [&settings](int i) {
-        const auto& setting = settings[i];
+        const auto& setting = *settings[i];
         std::string valueText = "";
         if (setting.type == SettingType::TOGGLE && setting.valuePtr != nullptr) {
           const bool value = SETTINGS.*(setting.valuePtr);

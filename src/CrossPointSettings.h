@@ -201,6 +201,11 @@ class CrossPointSettings {
   char opdsServerUrl[128] = "";
   char opdsUsername[64] = "";
   char opdsPassword[64] = "";
+
+  // Beeper Desktop API settings
+  char beeperApiUrl[128] = "";    // e.g. http://192.168.1.50:23373
+  char beeperApiToken[256] = "";  // Bearer token from Beeper Desktop
+
   // Hide battery percentage
   uint8_t hideBatteryPercentage = HIDE_NEVER;
   // Long-press chapter skip on side buttons

@@ -160,12 +160,12 @@ class SettingsActivity final : public Activity {
   int selectedSettingIndex = 0;
   int settingsCount = 0;
 
-  // Per-category settings derived from shared list + device-only actions
-  std::vector<SettingInfo> displaySettings;
-  std::vector<SettingInfo> readerSettings;
-  std::vector<SettingInfo> controlsSettings;
-  std::vector<SettingInfo> systemSettings;
-  const std::vector<SettingInfo>* currentSettings = nullptr;
+  // Per-category settings — pointers into the shared static list (no deep copies)
+  std::vector<const SettingInfo*> displaySettings;
+  std::vector<const SettingInfo*> readerSettings;
+  std::vector<const SettingInfo*> controlsSettings;
+  std::vector<const SettingInfo*> systemSettings;
+  const std::vector<const SettingInfo*>* currentSettings = nullptr;
 
   static constexpr int categoryCount = 4;
   static const StrId categoryNames[categoryCount];

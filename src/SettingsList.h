@@ -159,6 +159,7 @@ inline const std::vector<SettingInfo>& getSettingsList() {
       SettingInfo::String(StrId::STR_PASSWORD, SETTINGS.opdsPassword, sizeof(SETTINGS.opdsPassword), "opdsPassword",
                           StrId::STR_OPDS_BROWSER)
           .withObfuscated(),
+
       // --- Status Bar Settings (web-only, uses StatusBarSettingsActivity) ---
       SettingInfo::Toggle(StrId::STR_CHAPTER_PAGE_COUNT, &CrossPointSettings::statusBarChapterPageCount,
                           "statusBarChapterPageCount", StrId::STR_CUSTOMISE_STATUS_BAR),
@@ -177,6 +178,13 @@ inline const std::vector<SettingInfo>& getSettingsList() {
                           StrId::STR_CUSTOMISE_STATUS_BAR),
       SettingInfo::Toggle(StrId::STR_CLOCK, &CrossPointSettings::statusBarClock, "statusBarClock",
                           StrId::STR_CUSTOMISE_STATUS_BAR),
+
+      // --- Beeper Desktop API (web-only) ---
+      SettingInfo::String(StrId::STR_BEEPER_API_URL, SETTINGS.beeperApiUrl, sizeof(SETTINGS.beeperApiUrl),
+                          "beeperApiUrl", StrId::STR_CAT_BEEPER),
+      SettingInfo::String(StrId::STR_BEEPER_API_TOKEN, SETTINGS.beeperApiToken, sizeof(SETTINGS.beeperApiToken),
+                          "beeperApiToken", StrId::STR_CAT_BEEPER)
+          .withObfuscated(),
   };
   return list;
 }

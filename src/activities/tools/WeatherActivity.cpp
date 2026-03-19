@@ -266,7 +266,7 @@ bool WeatherActivity::parseWeather(const std::string& json) {
   weather.weatherCode = current["weather_code"] | 0;
   weather.windSpeed = current["wind_speed_10m"] | 0.0f;
 
-  // Parse daily forecast (skip day 0 = today, show next 5 days)
+  // Parse daily forecast
   forecastCount = 0;
   JsonObject daily = doc["daily"];
   if (!daily.isNull()) {
@@ -275,6 +275,13 @@ bool WeatherActivity::parseWeather(const std::string& json) {
     JsonArray maxTemps = daily["temperature_2m_max"];
     JsonArray minTemps = daily["temperature_2m_min"];
     JsonArray dates = daily["time"];
+    // Capture today's (day 0) high/low
+    if (codes.size() > 0) {
+      weather.todayHigh = maxTemps[0] | 0.0f;
+      weather.todayLow = minTemps[0] | 0.0f;
+      weather.hasTodayHighLow = true;
+    }
+    // Forecast: skip day 0 = today, show next 5 days
     for (int i = 1; i < (int)codes.size() && forecastCount < FORECAST_DAYS; i++) {
       auto& f = forecast[forecastCount];
       f.weatherCode = codes[i] | 0;
@@ -312,6 +319,9 @@ void WeatherActivity::saveWeatherCache() {
   doc["hum"] = weather.humidity;
   doc["code"] = weather.weatherCode;
   doc["wind"] = weather.windSpeed;
+  doc["todayHi"] = weather.todayHigh;
+  doc["todayLo"] = weather.todayLow;
+  doc["hasHL"] = weather.hasTodayHighLow;
   doc["city"] = selectedCity;
   doc["time"] = lastUpdateTime;
   if (detectedCityName[0]) doc["autoCity"] = detectedCityName;
@@ -340,6 +350,9 @@ bool WeatherActivity::loadWeatherCache(WeatherData& out, uint8_t& cityIdx, char*
   out.humidity = doc["hum"] | 0;
   out.weatherCode = doc["code"] | 0;
   out.windSpeed = doc["wind"] | 0.0f;
+  out.todayHigh = doc["todayHi"] | 0.0f;
+  out.todayLow = doc["todayLo"] | 0.0f;
+  out.hasTodayHighLow = doc["hasHL"] | false;
   cityIdx = doc["city"] | (uint8_t)0;
   if (cityIdx > CITY_COUNT) cityIdx = 0;
 
@@ -416,12 +429,14 @@ int WeatherActivity::silentRefresh() {
     delay(100);
   }
 
-  char url[256];
+  char url[384];
   snprintf(url, sizeof(url),
            "http://api.open-meteo.com/v1/forecast?"
            "latitude=%s&longitude=%s"
            "&current=temperature_2m,relative_humidity_2m,"
-           "apparent_temperature,weather_code,wind_speed_10m",
+           "apparent_temperature,weather_code,wind_speed_10m"
+           "&daily=temperature_2m_max,temperature_2m_min"
+           "&forecast_days=1",
            lat, lon);
 
   std::string response;
@@ -435,12 +450,29 @@ int WeatherActivity::silentRefresh() {
   JsonObject current = doc["current"];
   if (current.isNull()) { WiFi.disconnect(false); WiFi.mode(WIFI_OFF); return 5; }
 
+  // Extract today's hi/low from daily forecast (if present)
+  JsonObject daily = doc["daily"];
+  float todayHi = 0, todayLo = 0;
+  bool hasHL = false;
+  if (!daily.isNull()) {
+    JsonArray maxT = daily["temperature_2m_max"];
+    JsonArray minT = daily["temperature_2m_min"];
+    if (maxT.size() > 0) {
+      todayHi = maxT[0] | 0.0f;
+      todayLo = minT[0] | 0.0f;
+      hasHL = true;
+    }
+  }
+
   JsonDocument out;
   out["temp"]  = current["temperature_2m"] | 0.0f;
   out["feels"] = current["apparent_temperature"] | 0.0f;
   out["hum"]   = current["relative_humidity_2m"] | 0;
   out["code"]  = current["weather_code"] | 0;
   out["wind"]  = current["wind_speed_10m"] | 0.0f;
+  out["todayHi"] = todayHi;
+  out["todayLo"] = todayLo;
+  out["hasHL"] = hasHL;
   out["city"]  = city;
   out["tz"]    = tz;
   if (autoCity[0]) out["autoCity"] = autoCity;
@@ -636,10 +668,20 @@ void WeatherActivity::render(RenderLock&&) {
     renderer.drawCenteredText(NOTOSANS_18_FONT_ID, y, buf, true, EpdFontFamily::BOLD);
     y += renderer.getLineHeight(NOTOSANS_18_FONT_ID) + 4;
 
-    // Feels like
+    // Feels like + today's hi/low
     snprintf(buf, sizeof(buf), "%s %.0f%s", tr(STR_FEELS_LIKE), convertTemp(weather.feelsLike), tempUnitSuffix());
     renderer.drawCenteredText(UI_10_FONT_ID, y, buf);
-    y += renderer.getLineHeight(UI_10_FONT_ID) + 16;
+    y += renderer.getLineHeight(UI_10_FONT_ID) + 4;
+
+    if (weather.hasTodayHighLow) {
+      snprintf(buf, sizeof(buf), "H: %.0f%s  L: %.0f%s",
+               convertTemp(weather.todayHigh), tempUnitSuffix(),
+               convertTemp(weather.todayLow), tempUnitSuffix());
+      renderer.drawCenteredText(UI_10_FONT_ID, y, buf);
+      y += renderer.getLineHeight(UI_10_FONT_ID) + 12;
+    } else {
+      y += 12;
+    }
 
     // Details card — humidity & wind in rounded rect
     const int cardX = 20;
@@ -661,7 +703,7 @@ void WeatherActivity::render(RenderLock&&) {
     snprintf(buf, sizeof(buf), "%s", tr(STR_WIND));
     tw = renderer.getTextWidth(SMALL_FONT_ID, buf);
     renderer.drawText(SMALL_FONT_ID, cardX + colW + (colW - tw) / 2, detailY, buf);
-    snprintf(buf, sizeof(buf), "%.1f km/h", weather.windSpeed);
+    snprintf(buf, sizeof(buf), "%.0f mph", weather.windSpeed * 0.621371f);
     tw = renderer.getTextWidth(UI_12_FONT_ID, buf);
     renderer.drawText(UI_12_FONT_ID, cardX + colW + (colW - tw) / 2, detailY + 26, buf, true, EpdFontFamily::BOLD);
 

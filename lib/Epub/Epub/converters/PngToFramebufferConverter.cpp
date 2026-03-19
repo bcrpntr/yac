@@ -358,8 +358,8 @@ bool PngToFramebufferConverter::decodeToFramebuffer(const std::string& imagePath
     warnUnsupportedFeature("bit depth (" + std::to_string(png->getBpp()) + "bpp)", imagePath);
   }
 
-  // Allocate grayscale line buffer on demand (~3.2 KB) - freed after decode
-  const size_t grayBufSize = PNG_MAX_BUFFERED_PIXELS / 2;
+  // Allocate grayscale line buffer sized to actual source width — freed after decode
+  const size_t grayBufSize = ctx.srcWidth > 0 ? (size_t)ctx.srcWidth : (PNG_MAX_BUFFERED_PIXELS / 2);
   ctx.grayLineBuffer = static_cast<uint8_t*>(malloc(grayBufSize));
   if (!ctx.grayLineBuffer) {
     LOG_ERR("PNG", "Failed to allocate gray line buffer");

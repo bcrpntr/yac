@@ -1070,7 +1070,7 @@ const char* const CHARACTER_SETS[] = {
 namespace i18n_strings {
 
 const char* const STRINGS_EN[] = {
-    "CrossPet",
+    "Yac",
     "BOOTING",
     "SLEEPING",
     "Going to sleep",
@@ -1356,8 +1356,8 @@ const char* const STRINGS_EN[] = {
     "Classic",
     "Lyra",
     "Lyra Extended",
-    "CrossPet Reader",
-    "CrossPet Classic",
+    "Yac Reader",
+    "Yac Classic",
     "Sunlight Fading Fix",
     "Dark Mode",
     "Keep Clock Alive",
@@ -1756,10 +1756,17 @@ const char* const STRINGS_EN[] = {
     "Sync Weather & Time",
     "Power Double-Click",
     "Power Triple-Click",
+    "Lunatask",
+    "Lunatask API Token",
+    "Lunatask",
+    "Beeper",
+    "Beeper API URL",
+    "Beeper API Token",
+    "Beeper",
 };
 
 const char* const STRINGS_ES[] = {
-    "CrossPoint",
+    "Yac",
     "Iniciando...",
     "Suspendido",
     "Entrando en suspensi\xC3"
@@ -2249,8 +2256,8 @@ const char* const STRINGS_ES[] = {
     "sico",
     "Lyra",
     "Lyra Extendido",
-    "CrossPet Reader",
-    "CrossPet Classic",
+    "Yac Reader",
+    "Yac Classic",
     "Correcci\xC3"
     "\xB3"
     "n de desvanecimiento",
@@ -2721,10 +2728,17 @@ const char* const STRINGS_ES[] = {
     "Sync Weather & Time",
     "Power Double-Click",
     "Power Triple-Click",
+    "Lunatask",
+    "Lunatask API Token",
+    "Lunatask",
+    "Beeper",
+    "Beeper API URL",
+    "Beeper API Token",
+    "Beeper",
 };
 
 const char* const STRINGS_FR[] = {
-    "CrossPoint",
+    "Yac",
     "D\xC3"
     "\x89"
     "MARRAGE EN COURS",
@@ -3340,8 +3354,8 @@ const char* const STRINGS_FR[] = {
     "Classique",
     "Lyra",
     "Lyra Extended",
-    "CrossPet Reader",
-    "CrossPet Classic",
+    "Yac Reader",
+    "Yac Classic",
     "Correction lisibilit\xC3"
     "\xA9"
     " au soleil",
@@ -3817,10 +3831,17 @@ const char* const STRINGS_FR[] = {
     "Sync Weather & Time",
     "Power Double-Click",
     "Power Triple-Click",
+    "Lunatask",
+    "Lunatask API Token",
+    "Lunatask",
+    "Beeper",
+    "Beeper API URL",
+    "Beeper API Token",
+    "Beeper",
 };
 
 const char* const STRINGS_DE[] = {
-    "CrossPoint",
+    "Yac",
     "STARTEN",
     "STANDBY",
     "Standby",
@@ -4244,8 +4265,8 @@ const char* const STRINGS_DE[] = {
     "Klassisch",
     "Lyra",
     "Lyra Extended",
-    "CrossPet Reader",
-    "CrossPet Classic",
+    "Yac Reader",
+    "Yac Classic",
     "Anti-Verblassen",
     "Dark Mode",
     "Keep Clock Alive",
@@ -4682,10 +4703,17 @@ const char* const STRINGS_DE[] = {
     "Sync Weather & Time",
     "Power Double-Click",
     "Power Triple-Click",
+    "Lunatask",
+    "Lunatask API Token",
+    "Lunatask",
+    "Beeper",
+    "Beeper API URL",
+    "Beeper API Token",
+    "Beeper",
 };
 
 const char* const STRINGS_CS[] = {
-    "CrossPoint",
+    "Yac",
     "SPU\xC5"
     "\xA0"
     "T\xC4"
@@ -5965,8 +5993,8 @@ const char* const STRINGS_CS[] = {
     "",
     "Lyra",
     "Lyra Extended",
-    "CrossPet Reader",
-    "CrossPet Classic",
+    "Yac Reader",
+    "Yac Classic",
     "Oprava blednut\xC3"
     "\xAD"
     " na slunci",
@@ -6659,10 +6687,17 @@ const char* const STRINGS_CS[] = {
     "Sync Weather & Time",
     "Power Double-Click",
     "Power Triple-Click",
+    "Lunatask",
+    "Lunatask API Token",
+    "Lunatask",
+    "Beeper",
+    "Beeper API URL",
+    "Beeper API Token",
+    "Beeper",
 };
 
 const char* const STRINGS_PO[] = {
-    "CrossPoint",
+    "Yac",
     "INICIANDO",
     "EM REPOUSO",
     "Entrando em repouso",
@@ -7181,8 +7216,8 @@ const char* const STRINGS_PO[] = {
     "ssico",
     "Lyra",
     "Lyra Extended",
-    "CrossPet Reader",
-    "CrossPet Classic",
+    "Yac Reader",
+    "Yac Classic",
     "Ajuste desbotamento ao sol",
     "Dark Mode",
     "Keep Clock Alive",
@@ -7655,10 +7690,17 @@ const char* const STRINGS_PO[] = {
     "Sync Weather & Time",
     "Power Double-Click",
     "Power Triple-Click",
+    "Lunatask",
+    "Lunatask API Token",
+    "Lunatask",
+    "Beeper",
+    "Beeper API URL",
+    "Beeper API Token",
+    "Beeper",
 };
 
 const char* const STRINGS_RU[] = {
-    "CrossPoint",
+    "Yac",
     "\xD0"
     "\x97"
     "\xD0"
@@ -14440,8 +14482,8 @@ const char* const STRINGS_RU[] = {
     "",
     "Lyra",
     "Lyra Extended",
-    "CrossPet Reader",
-    "CrossPet Classic",
+    "Yac Reader",
+    "Yac Classic",
     "\xD0"
     "\x9A"
     "\xD0"
@@ -16746,10 +16788,17 @@ const char* const STRINGS_RU[] = {
     "Sync Weather & Time",
     "Power Double-Click",
     "Power Triple-Click",
+    "Lunatask",
+    "Lunatask API Token",
+    "Lunatask",
+    "Beeper",
+    "Beeper API URL",
+    "Beeper API Token",
+    "Beeper",
 };
 
 const char* const STRINGS_SV[] = {
-    "Crosspoint",
+    "Yac",
     "STARTAR",
     "VILA",
     "G\xC3"
@@ -17455,8 +17504,8 @@ const char* const STRINGS_SV[] = {
     "Klassisk",
     "Lyra",
     "Lyra Extended",
-    "CrossPet Reader",
-    "CrossPet Classic",
+    "Yac Reader",
+    "Yac Classic",
     "Fix f\xC3"
     "\xB6"
     "r solskensmattning",
@@ -17959,10 +18008,17 @@ const char* const STRINGS_SV[] = {
     "Sync Weather & Time",
     "Power Double-Click",
     "Power Triple-Click",
+    "Lunatask",
+    "Lunatask API Token",
+    "Lunatask",
+    "Beeper",
+    "Beeper API URL",
+    "Beeper API Token",
+    "Beeper",
 };
 
 const char* const STRINGS_RO[] = {
-    "CrossPoint",
+    "Yac",
     "PORNE\xC5"
     "\x9E"
     "TE",
@@ -18802,8 +18858,8 @@ const char* const STRINGS_RO[] = {
     "Clasic",
     "Lyra",
     "Lyra Extended",
-    "CrossPet Reader",
-    "CrossPet Classic",
+    "Yac Reader",
+    "Yac Classic",
     "Corec\xC5"
     "\xA3"
     "ie estompare lumin\xC4"
@@ -19336,10 +19392,17 @@ const char* const STRINGS_RO[] = {
     "Sync Weather & Time",
     "Power Double-Click",
     "Power Triple-Click",
+    "Lunatask",
+    "Lunatask API Token",
+    "Lunatask",
+    "Beeper",
+    "Beeper API URL",
+    "Beeper API Token",
+    "Beeper",
 };
 
 const char* const STRINGS_CA[] = {
-    "CrossPoint",
+    "Yac",
     "ARRENCANT",
     "ENTRANT EN REP\xC3"
     "\x92"
@@ -19863,8 +19926,8 @@ const char* const STRINGS_CA[] = {
     "ssic",
     "Lyra",
     "Lyra Ampliat",
-    "CrossPet Reader",
-    "CrossPet Classic",
+    "Yac Reader",
+    "Yac Classic",
     "Correcci\xC3"
     "\xB3"
     " de l'esva\xC3"
@@ -20345,10 +20408,17 @@ const char* const STRINGS_CA[] = {
     "Sync Weather & Time",
     "Power Double-Click",
     "Power Triple-Click",
+    "Lunatask",
+    "Lunatask API Token",
+    "Lunatask",
+    "Beeper",
+    "Beeper API URL",
+    "Beeper API Token",
+    "Beeper",
 };
 
 const char* const STRINGS_UK[] = {
-    "CrossPoint",
+    "Yac",
     "\xD0"
     "\x97"
     "\xD0"
@@ -28056,8 +28126,8 @@ const char* const STRINGS_UK[] = {
     "",
     "Lyra",
     "Lyra Extended",
-    "CrossPet Reader",
-    "CrossPet Classic",
+    "Yac Reader",
+    "Yac Classic",
     "\xD0"
     "\x92"
     "\xD0"
@@ -30686,10 +30756,17 @@ const char* const STRINGS_UK[] = {
     "Sync Weather & Time",
     "Power Double-Click",
     "Power Triple-Click",
+    "Lunatask",
+    "Lunatask API Token",
+    "Lunatask",
+    "Beeper",
+    "Beeper API URL",
+    "Beeper API Token",
+    "Beeper",
 };
 
 const char* const STRINGS_BE[] = {
-    "CrossPoint",
+    "Yac",
     "\xD0"
     "\x97"
     "\xD0"
@@ -37197,8 +37274,8 @@ const char* const STRINGS_BE[] = {
     "",
     "Lyra",
     "Lyra Extended",
-    "CrossPet Reader",
-    "CrossPet Classic",
+    "Yac Reader",
+    "Yac Classic",
     "\xD0"
     "\x9A"
     "\xD0"
@@ -39447,10 +39524,17 @@ const char* const STRINGS_BE[] = {
     "Sync Weather & Time",
     "Power Double-Click",
     "Power Triple-Click",
+    "Lunatask",
+    "Lunatask API Token",
+    "Lunatask",
+    "Beeper",
+    "Beeper API URL",
+    "Beeper API Token",
+    "Beeper",
 };
 
 const char* const STRINGS_IT[] = {
-    "CrossPoint",
+    "Yac",
     "AVVIO IN CORSO",
     "MODALIT\xC3"
     "\x80"
@@ -39761,8 +39845,8 @@ const char* const STRINGS_IT[] = {
     "Classico",
     "Lyra",
     "Lyra Esteso",
-    "CrossPet Reader",
-    "CrossPet Classic",
+    "Yac Reader",
+    "Yac Classic",
     "Fix Sbiadimento da Luce Solare",
     "Dark Mode",
     "Keep Clock Alive",
@@ -40175,10 +40259,17 @@ const char* const STRINGS_IT[] = {
     "Sync Weather & Time",
     "Power Double-Click",
     "Power Triple-Click",
+    "Lunatask",
+    "Lunatask API Token",
+    "Lunatask",
+    "Beeper",
+    "Beeper API URL",
+    "Beeper API Token",
+    "Beeper",
 };
 
 const char* const STRINGS_PL[] = {
-    "CrossPoint",
+    "Yac",
     "Bootowanie",
     "U\xC5"
     "\x9B"
@@ -41028,8 +41119,8 @@ const char* const STRINGS_PL[] = {
     "Classic",
     "Lyra",
     "Lyra Extended",
-    "CrossPet Reader",
-    "CrossPet Classic",
+    "Yac Reader",
+    "Yac Classic",
     "Przeciwdzia\xC5"
     "\x82"
     "anie blakni\xC4"
@@ -41574,10 +41665,17 @@ const char* const STRINGS_PL[] = {
     "Sync Weather & Time",
     "Power Double-Click",
     "Power Triple-Click",
+    "Lunatask",
+    "Lunatask API Token",
+    "Lunatask",
+    "Beeper",
+    "Beeper API URL",
+    "Beeper API Token",
+    "Beeper",
 };
 
 const char* const STRINGS_FI[] = {
-    "CrossPoint",
+    "Yac",
     "K\xC3"
     "\x84"
     "YNNISTYY",
@@ -42231,8 +42329,8 @@ const char* const STRINGS_FI[] = {
     "Klassinen",
     "Lyra",
     "Lyra Extended",
-    "CrossPet Reader",
-    "CrossPet Classic",
+    "Yac Reader",
+    "Yac Classic",
     "Auringonvalon haalistumiskorjaus",
     "Dark Mode",
     "Keep Clock Alive",
@@ -42739,10 +42837,17 @@ const char* const STRINGS_FI[] = {
     "Sync Weather & Time",
     "Power Double-Click",
     "Power Triple-Click",
+    "Lunatask",
+    "Lunatask API Token",
+    "Lunatask",
+    "Beeper",
+    "Beeper API URL",
+    "Beeper API Token",
+    "Beeper",
 };
 
 const char* const STRINGS_DA[] = {
-    "CrossPoint",
+    "Yac",
     "STARTER",
     "HVILE",
     "G\xC3"
@@ -43232,8 +43337,8 @@ const char* const STRINGS_DA[] = {
     "Klassisk",
     "Lyra",
     "Lyra Extended",
-    "CrossPet Reader",
-    "CrossPet Classic",
+    "Yac Reader",
+    "Yac Classic",
     "Sollysfading-rettelse",
     "Dark Mode",
     "Keep Clock Alive",
@@ -43666,10 +43771,17 @@ const char* const STRINGS_DA[] = {
     "Sync Weather & Time",
     "Power Double-Click",
     "Power Triple-Click",
+    "Lunatask",
+    "Lunatask API Token",
+    "Lunatask",
+    "Beeper",
+    "Beeper API URL",
+    "Beeper API Token",
+    "Beeper",
 };
 
 const char* const STRINGS_NL[] = {
-    "CrossPoint",
+    "Yac",
     "OPSTARTEN",
     "SLAAPSTAND",
     "Gaat in slaapstand",
@@ -43959,8 +44071,8 @@ const char* const STRINGS_NL[] = {
     "Klassiek",
     "Lyra",
     "Lyra Uitgebreid",
-    "CrossPet Reader",
-    "CrossPet Classic",
+    "Yac Reader",
+    "Yac Classic",
     "Zonlicht vervaging fix",
     "Dark Mode",
     "Keep Clock Alive",
@@ -44361,10 +44473,17 @@ const char* const STRINGS_NL[] = {
     "Sync Weather & Time",
     "Power Double-Click",
     "Power Triple-Click",
+    "Lunatask",
+    "Lunatask API Token",
+    "Lunatask",
+    "Beeper",
+    "Beeper API URL",
+    "Beeper API Token",
+    "Beeper",
 };
 
 const char* const STRINGS_TR[] = {
-    "CrossPoint",
+    "Yac",
     "BA\xC5"
     "\x9E"
     "LATILIYOR",
@@ -45520,8 +45639,8 @@ const char* const STRINGS_TR[] = {
     "letilmi\xC5"
     "\x9F"
     "",
-    "CrossPet Reader",
-    "CrossPet Classic",
+    "Yac Reader",
+    "Yac Classic",
     "G\xC3"
     "\xBC"
     "ne\xC5"
@@ -46114,10 +46233,17 @@ const char* const STRINGS_TR[] = {
     "Sync Weather & Time",
     "Power Double-Click",
     "Power Triple-Click",
+    "Lunatask",
+    "Lunatask API Token",
+    "Lunatask",
+    "Beeper",
+    "Beeper API URL",
+    "Beeper API Token",
+    "Beeper",
 };
 
 const char* const STRINGS_VI[] = {
-    "CrossPet",
+    "Yac",
     "\xC4"
     "\x90"
     "ANG KH\xE1"
@@ -51121,6 +51247,13 @@ const char* const STRINGS_VI[] = {
     "\xBA"
     "\xA5"
     "m ba",
+    "Lunatask",
+    "Lunatask API Token",
+    "Lunatask",
+    "Beeper",
+    "Beeper API URL",
+    "Beeper API Token",
+    "Beeper",
 };
 
 }  // namespace i18n_strings

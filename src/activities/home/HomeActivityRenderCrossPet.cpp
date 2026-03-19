@@ -19,6 +19,7 @@
 #include "components/icons/settings2.h"
 #include "components/icons/tools.h"
 #include "components/icons/transfer.h"
+#include "components/icons/book.h"
 #include "fontIds.h"
 
 // ── CrossPet layout constants ────────────────────────────────────────────────

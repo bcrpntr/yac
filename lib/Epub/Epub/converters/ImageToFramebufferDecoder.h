@@ -33,7 +33,7 @@ class ImageToFramebufferDecoder {
 
  protected:
   // Size validation helpers
-  static constexpr int MAX_SOURCE_PIXELS = 3145728;  // 2048 * 1536
+  static constexpr int MAX_SOURCE_PIXELS = 67108864;  // 8192 * 8192 — effectively unlimited for EPUBs
 
   bool validateImageDimensions(int width, int height, const std::string& format);
   void warnUnsupportedFeature(const std::string& feature, const std::string& imagePath);

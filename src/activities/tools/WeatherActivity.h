@@ -17,6 +17,9 @@ struct WeatherData {
   int humidity = 0;
   int weatherCode = 0;
   float windSpeed = 0;
+  float todayHigh = 0;
+  float todayLow = 0;
+  bool hasTodayHighLow = false;
 };
 
 struct DailyForecast {

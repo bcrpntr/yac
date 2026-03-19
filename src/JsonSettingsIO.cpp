@@ -72,6 +72,11 @@ bool JsonSettingsIO::saveState(const CrossPointState& s, const char* path) {
   doc["lastSleepImage"] = s.lastSleepImage;
   doc["readerActivityLoadCount"] = s.readerActivityLoadCount;
   doc["lastSleepFromReader"] = s.lastSleepFromReader;
+  doc["lastFlashcardDeck"] = s.lastFlashcardDeck;
+  doc["flashcardDayCounter"] = s.flashcardDayCounter;
+  doc["flashcardSessionIndex"] = s.flashcardSessionIndex;
+  doc["flashcardSessionSize"] = s.flashcardSessionSize;
+  doc["flashcardShuffleSeed"] = s.flashcardShuffleSeed;
 
   String json;
   serializeJson(doc, json);
@@ -90,6 +95,11 @@ bool JsonSettingsIO::loadState(CrossPointState& s, const char* json) {
   s.lastSleepImage = doc["lastSleepImage"] | (uint8_t)UINT8_MAX;
   s.readerActivityLoadCount = doc["readerActivityLoadCount"] | (uint8_t)0;
   s.lastSleepFromReader = doc["lastSleepFromReader"] | false;
+  s.lastFlashcardDeck = doc["lastFlashcardDeck"] | std::string("");
+  s.flashcardDayCounter = doc["flashcardDayCounter"] | (uint32_t)0;
+  s.flashcardSessionIndex = doc["flashcardSessionIndex"] | (uint32_t)0;
+  s.flashcardSessionSize = doc["flashcardSessionSize"] | (uint32_t)0;
+  s.flashcardShuffleSeed = doc["flashcardShuffleSeed"] | (uint32_t)0;
   return true;
 }
 

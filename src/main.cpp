@@ -28,11 +28,14 @@
 #include "RecentBooksStore.h"
 #include "activities/Activity.h"
 #include "activities/ActivityManager.h"
+#include "SettingsList.h"
 #include "pet/PetManager.h"
 #include "components/UITheme.h"
 #include "fontIds.h"
 #include "util/ButtonNavigator.h"
 #include "util/ScreenshotUtil.h"
+#include "WifiCredentialStore.h"
+#include <WiFi.h>
 #include "activities/tools/ReadingStatsActivity.h"
 #include "activities/tools/WeatherActivity.h"
 #include "util/PowerButtonClickDetector.h"
@@ -197,6 +200,58 @@ unsigned long t2 = 0;
 // Forward declaration — defined later in setup section
 void setupDisplayAndFonts();
 
+// Quick background NTP sync using saved WiFi credentials.
+// Connects WiFi, fires off NTP, optionally waits for sync, then disconnects.
+// Returns true if NTP sync completed within timeout.
+static bool silentNtpSync(bool waitForSync = true, int connectTimeoutMs = 6000, int ntpTimeoutMs = 3000) {
+  if (WiFi.status() == WL_CONNECTED) {
+    // Already connected — just trigger NTP
+    const char* tz = getenv("TZ");
+    configTzTime(tz ? tz : "ICT-7", "pool.ntp.org", "time.google.com");
+    if (waitForSync) {
+      for (int i = 0; i < ntpTimeoutMs / 100; i++) {
+        if (!g_clockApproximate) return true;
+        delay(100);
+      }
+    }
+    return !g_clockApproximate;
+  }
+
+  const auto& ssid = WIFI_STORE.getLastConnectedSsid();
+  if (ssid.empty()) return false;
+  const auto* cred = WIFI_STORE.findCredential(ssid);
+  if (!cred) return false;
+
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(cred->ssid.c_str(), cred->password.c_str());
+  bool connected = false;
+  for (int i = 0; i < connectTimeoutMs / 100; i++) {
+    if (WiFi.status() == WL_CONNECTED) { connected = true; break; }
+    delay(100);
+  }
+  if (!connected) {
+    WiFi.disconnect(false);
+    WiFi.mode(WIFI_OFF);
+    return false;
+  }
+
+  const char* tz = getenv("TZ");
+  configTzTime(tz ? tz : "ICT-7", "pool.ntp.org", "time.google.com");
+
+  bool synced = false;
+  if (waitForSync) {
+    for (int i = 0; i < ntpTimeoutMs / 100; i++) {
+      if (!g_clockApproximate) { synced = true; break; }
+      delay(100);
+    }
+  }
+
+  WiFi.disconnect(false);
+  WiFi.mode(WIFI_OFF);
+  LOG_DBG("NTP", "Silent sync: %s", synced ? "ok" : "timeout");
+  return synced;
+}
+
 // Verify power button press duration on wake-up from deep sleep
 // Pre-condition: isWakeupByPowerButton() == true
 void verifyPowerButtonDuration() {
@@ -263,6 +318,9 @@ void enterDeepSleep() {
   APP_STATE.lastSleepFromReader = activityManager.isReaderActivity();
   APP_STATE.saveToFile();
 
+  // NTP sync before sleep — ensures saved clock timestamp is accurate
+  silentNtpSync(true, 4000, 2000);
+
   activityManager.goToSleep();
 
   display.deepSleep();
@@ -278,8 +336,12 @@ void enterDeepSleep() {
   // Also save to SD as reliable fallback (RTC_DATA_ATTR can be lost on some ESP32-C3 boards)
   saveClockToSD();
 
-  powerManager.startDeepSleep(gpio, SETTINGS.keepClockAlive != 0,
-                                CrossPointSettings::getSleepRefreshMinutes(SETTINGS.sleepRefreshInterval));
+  // Force 1-minute refresh when clock sleep screen is active
+  uint32_t refreshMin = CrossPointSettings::getSleepRefreshMinutes(SETTINGS.sleepRefreshInterval);
+  if (SETTINGS.sleepScreen == CrossPointSettings::SLEEP_SCREEN_MODE::CLOCK && refreshMin != 0) {
+    refreshMin = 1;
+  }
+  powerManager.startDeepSleep(gpio, SETTINGS.keepClockAlive != 0, refreshMin);
 }
 
 void setupDisplayAndFonts() {
@@ -345,6 +407,12 @@ void setup() {
 
   SETTINGS.loadFromFile();
   PET_SETTINGS.loadFromFile();
+
+  // Force-construct the shared settings list early while the call stack is shallow.
+  // Without this, the first call to getSettingsList() happens inside a web server
+  // handler where the deep call chain leaves insufficient stack for the static
+  // vector's initializer-list construction (~50 SettingInfo objects with std::function).
+  (void)getSettingsList();
   I18N.loadSettings();
   KOREADER_STORE.loadFromFile();
   READ_STATS.loadFromFile();   // loaded early so abort-to-sleep paths show correct stats
@@ -421,12 +489,45 @@ void setup() {
       const auto mode = SETTINGS.sleepScreen;
       if (mode == CrossPointSettings::SLEEP_SCREEN_MODE::CLOCK ||
           mode == CrossPointSettings::SLEEP_SCREEN_MODE::READING_STATS) {
+        // Quick NTP sync to fix RTC drift accumulated during deep sleep
+        silentNtpSync(true, 6000, 3000);
+
+        // Refresh weather cache every ~15 minutes during sleep screen refreshes.
+        // Check if 15+ minutes have elapsed since last weather update.
+        {
+          WeatherData wCheck;
+          uint8_t wCityCheck = 0;
+          char wTimeCheck[8] = "";
+          bool hasCache = WeatherActivity::loadWeatherCache(wCheck, wCityCheck, wTimeCheck, sizeof(wTimeCheck));
+          bool shouldRefreshWeather = !hasCache;  // Always refresh if no cache
+          if (hasCache && wTimeCheck[0]) {
+            // Parse cached HH:MM and compare to current time
+            time_t now; time(&now);
+            struct tm nowTm; localtime_r(&now, &nowTm);
+            int cachedH = 0, cachedM = 0;
+            if (sscanf(wTimeCheck, "%d:%d", &cachedH, &cachedM) == 2) {
+              int nowMin = nowTm.tm_hour * 60 + nowTm.tm_min;
+              int cachedMin = cachedH * 60 + cachedM;
+              int elapsed = nowMin - cachedMin;
+              if (elapsed < 0) elapsed += 1440;  // Wrapped past midnight
+              shouldRefreshWeather = (elapsed >= 15);
+            }
+          }
+          if (shouldRefreshWeather) {
+            WeatherActivity::silentRefresh();
+          }
+        }
+
         setupDisplayAndFonts();
         activityManager.goToSleep();
       }
       saveClockToSD();
-      powerManager.startDeepSleep(gpio, SETTINGS.keepClockAlive != 0,
-                                  CrossPointSettings::getSleepRefreshMinutes(SETTINGS.sleepRefreshInterval));
+      // Force 1-minute refresh for clock sleep screen
+      uint32_t timerRefresh = CrossPointSettings::getSleepRefreshMinutes(SETTINGS.sleepRefreshInterval);
+      if (mode == CrossPointSettings::SLEEP_SCREEN_MODE::CLOCK && timerRefresh != 0) {
+        timerRefresh = 1;
+      }
+      powerManager.startDeepSleep(gpio, SETTINGS.keepClockAlive != 0, timerRefresh);
       break;  // unreachable — startDeepSleep never returns
     }
     case HalGPIO::WakeupReason::AfterUSBPower:
@@ -443,7 +544,12 @@ void setup() {
   }
 
   // First serial output only here to avoid timing inconsistencies for power button press duration verification
-  LOG_DBG("MAIN", "Starting CrossPoint version " CROSSPOINT_VERSION);
+  LOG_DBG("MAIN", "Starting Yac version " YAC_VERSION);
+
+  // Background NTP sync on wake — corrects RTC drift from deep sleep
+  if (g_clockApproximate) {
+    silentNtpSync(true, 4000, 2000);
+  }
 
   setupDisplayAndFonts();
 

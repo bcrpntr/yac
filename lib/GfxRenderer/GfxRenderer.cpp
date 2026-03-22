@@ -423,6 +423,20 @@ void GfxRenderer::drawRoundedRect(const int x, const int y, const int width, con
   }
 }
 
+namespace {
+// 4×4 Bayer matrix for ordered dithering. Values 0–15; threshold < 8 = black, ≥ 8 = white.
+// Produces smooth 50% gray without the harsh diagonal artifacts of a checkerboard.
+constexpr bool bayer4x4(const int x, const int y) {
+  // Matrix values (access pattern: mat[y % 4][x % 4])
+  //  0  8  2 10
+  // 12  4 14  6
+  //  3 11  1  9
+  // 15  7 13  5
+  static const uint8_t mat[16] = {0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5};
+  return mat[((y & 3) << 2) | (x & 3)] >= 8;
+}
+}  // namespace
+
 void GfxRenderer::fillRect(const int x, const int y, const int width, const int height, const bool state) const {
   for (int fillY = y; fillY < y + height; fillY++) {
     drawLine(x, fillY, x + width - 1, fillY, state);
@@ -453,7 +467,7 @@ void GfxRenderer::drawPixelDither<Color::LightGray>(const int x, const int y) co
 
 template <>
 void GfxRenderer::drawPixelDither<Color::DarkGray>(const int x, const int y) const {
-  drawPixel(x, y, (x + y) % 2 == 0);  // TODO: maybe find a better pattern?
+  drawPixel(x, y, bayer4x4(x, y));
 }
 
 void GfxRenderer::fillRectDither(const int x, const int y, const int width, const int height, Color color) const {

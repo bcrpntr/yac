@@ -1431,6 +1431,9 @@ const char* const STRINGS_EN[] = {
     "Embedded Style",
     "OPDS Server URL",
     "Beeper API URL",
+    "Beeper",
+    "No chats found",
+    "No messages",
     "Footnotes",
     "No footnotes on this page",
     "[link]",
@@ -2400,6 +2403,9 @@ const char* const STRINGS_ES[] = {
     "Estilo integrado",
     "URL del servidor OPDS",
     "Beeper API URL",
+    "Beeper",
+    "No chats found",
+    "No messages",
     "Pie de p\xC3"
     "\xA1"
     "gina",
@@ -3518,6 +3524,9 @@ const char* const STRINGS_FR[] = {
     "",
     "URL serveur OPDS",
     "Beeper API URL",
+    "Beeper",
+    "No chats found",
+    "No messages",
     "Footnotes",
     "No footnotes on this page",
     "[link]",
@@ -4391,6 +4400,9 @@ const char* const STRINGS_DE[] = {
     "Eingebetteter Stil",
     "OPDS-Server-URL",
     "Beeper API URL",
+    "Beeper",
+    "No chats found",
+    "No messages",
     "Fu\xC3"
     "\x9F"
     "noten",
@@ -6386,6 +6398,9 @@ const char* const STRINGS_CS[] = {
     " styl",
     "URL serveru OPDS",
     "Beeper API URL",
+    "Beeper",
+    "No chats found",
+    "No messages",
     "Footnotes",
     "No footnotes on this page",
     "[link]",
@@ -7400,6 +7415,9 @@ const char* const STRINGS_PO[] = {
     "Estilo embutido",
     "URL do servidor OPDS",
     "Beeper API URL",
+    "Beeper",
+    "No chats found",
+    "No messages",
     "Footnotes",
     "No footnotes on this page",
     "[link]",
@@ -16467,6 +16485,9 @@ const char* const STRINGS_RU[] = {
     "\xB0"
     "",
     "Beeper API URL",
+    "Beeper",
+    "No chats found",
+    "No messages",
     "Footnotes",
     "No footnotes on this page",
     "[link]",
@@ -17720,6 +17741,9 @@ const char* const STRINGS_SV[] = {
     "ddad stil",
     "OPDS-serveradress",
     "Beeper API URL",
+    "Beeper",
+    "No chats found",
+    "No messages",
     "Fotnoter",
     "Inga fotnoter p\xC3"
     "\xA5"
@@ -19115,6 +19139,9 @@ const char* const STRINGS_RO[] = {
     "ncorporat",
     "URL server OPDS",
     "Beeper API URL",
+    "Beeper",
+    "No chats found",
+    "No messages",
     "Note de subsol",
     "Nicio not\xC4"
     "\x83"
@@ -20136,6 +20163,9 @@ const char* const STRINGS_CA[] = {
     "Estil incrustat",
     "URL del servidor OPDS",
     "Beeper API URL",
+    "Beeper",
+    "No chats found",
+    "No messages",
     "Notes al peu",
     "No hi ha notes al peu en aquesta p\xC3"
     "\xA0"
@@ -30317,6 +30347,9 @@ const char* const STRINGS_UK[] = {
     "\xB0"
     " OPDS",
     "Beeper API URL",
+    "Beeper",
+    "No chats found",
+    "No messages",
     "\xD0"
     "\x97"
     "\xD0"
@@ -39238,6 +39271,9 @@ const char* const STRINGS_BE[] = {
     "\xB0"
     "",
     "Beeper API URL",
+    "Beeper",
+    "No chats found",
+    "No messages",
     "Footnotes",
     "No footnotes on this page",
     "[link]",
@@ -40018,6 +40054,9 @@ const char* const STRINGS_IT[] = {
     "Stile Integrato",
     "URL del Server OPDS",
     "Beeper API URL",
+    "Beeper",
+    "No chats found",
+    "No messages",
     "Footnotes",
     "No footnotes on this page",
     "[link]",
@@ -41427,6 +41466,9 @@ const char* const STRINGS_PL[] = {
     "Style wbudowane w EPUB",
     "URL serwera OPDS",
     "Beeper API URL",
+    "Beeper",
+    "No chats found",
+    "No messages",
     "Przypisy",
     "Brak przypis\xC3"
     "\xB3"
@@ -42610,6 +42652,9 @@ const char* const STRINGS_FI[] = {
     "Upotettu tyyli",
     "OPDS-palvelimen osoite",
     "Beeper API URL",
+    "Beeper",
+    "No chats found",
+    "No messages",
     "Footnotes",
     "No footnotes on this page",
     "[link]",
@@ -43549,6 +43594,9 @@ const char* const STRINGS_DA[] = {
     "Indlejret stil",
     "OPDS Server URL",
     "Beeper API URL",
+    "Beeper",
+    "No chats found",
+    "No messages",
     "Footnotes",
     "No footnotes on this page",
     "[link]",
@@ -44260,6 +44308,9 @@ const char* const STRINGS_NL[] = {
     "Ingebedde stijl",
     "OPDS-server URL",
     "Beeper API URL",
+    "Beeper",
+    "No chats found",
+    "No messages",
     "Voetnoten",
     "Geen voetnoten op deze pagina",
     "[link]",
@@ -46011,6 +46062,9 @@ const char* const STRINGS_TR[] = {
     " Stil",
     "OPDS Sunucu Adresi",
     "Beeper API URL",
+    "Beeper",
+    "No chats found",
+    "No messages",
     "Dipnotlar",
     "Bu sayfada dipnot yok",
     "[ba\xC4"
@@ -49321,6 +49375,9 @@ const char* const STRINGS_VI[] = {
     "\xA7"
     " OPDS",
     "Beeper API URL",
+    "Beeper",
+    "No chats found",
+    "No messages",
     "Ch\xC3"
     "\xBA"
     " th\xC3"

@@ -28,7 +28,7 @@ void BeeperActivity::onEnter() {
   chats.clear();
   messages.clear();
   currentChatId.clear();
-  statusMessage = "Connecting...";
+  statusMessage = tr(STR_CONNECTING);
   requestUpdate();
   fetchChats();
 }
@@ -43,7 +43,7 @@ void BeeperActivity::fetchChats() {
   std::string response;
   std::string url = std::string(getApiBase()) + "/v1/chats/list?limit=50&include_muted=true";
   if (!HttpDownloader::fetchUrl(url, response)) {
-    statusMessage = "Connection failed";
+    statusMessage = tr(STR_CONNECTION_FAILED);
     fetchState = FetchState::FAILED;
     state = State::ERROR;
     requestUpdate();
@@ -52,7 +52,7 @@ void BeeperActivity::fetchChats() {
 
   parseChats(response);
   if (chats.empty()) {
-    statusMessage = "No chats found";
+    statusMessage = tr(STR_BEEPER_NO_CHATS);
     fetchState = FetchState::DONE;
     state = State::ERROR;
   } else {
@@ -72,7 +72,7 @@ void BeeperActivity::fetchMessages(const std::string& chatId) {
            BEEPER_MAX_MESSAGES);
 
   if (!HttpDownloader::fetchUrl(url, response)) {
-    statusMessage = "Failed to load messages";
+    statusMessage = tr(STR_CONNECTION_FAILED);
     fetchState = FetchState::FAILED;
     requestUpdate();
     return;
@@ -187,7 +187,7 @@ void BeeperActivity::loop() {
       currentChatId = chats[selectorIndex].id;
       state = State::CHAT_MESSAGES;
       fetchState = FetchState::FETCHING;
-      statusMessage = "Loading messages...";
+      statusMessage = tr(STR_CONNECTING);
       requestUpdate();
       fetchMessages(currentChatId);
     }
@@ -202,8 +202,7 @@ void BeeperActivity::render(RenderLock&&) {
   const int visibleRows = (pageHeight - metrics.topPadding - metrics.headerHeight - metrics.buttonHintsHeight) / rowHeight;
 
   renderer.clearScreen();
-  renderer.drawHeader(renderer, Rect{0, metrics.topPadding, pageWidth, metrics.headerHeight},
-                      state == State::CHAT_MESSAGES ? "Beeper" : "Beeper");
+  renderer.drawHeader(renderer, Rect{0, metrics.topPadding, pageWidth, metrics.headerHeight}, tr(STR_BEEPER));
 
   if (fetchState == FetchState::FETCHING) {
     int tw = renderer.getTextWidth(UI_10_FONT_ID, statusMessage.c_str());
@@ -285,8 +284,9 @@ void BeeperActivity::render(RenderLock&&) {
     }
 
     if (messages.empty()) {
-      int tw = renderer.getTextWidth(UI_10_FONT_ID, "No messages");
-      renderer.drawText(UI_10_FONT_ID, (pageWidth - tw) / 2, pageHeight / 2, "No messages", true);
+      const char* noMsg = tr(STR_BEEPER_NO_MESSAGES);
+      int tw = renderer.getTextWidth(UI_10_FONT_ID, noMsg);
+      renderer.drawText(UI_10_FONT_ID, (pageWidth - tw) / 2, pageHeight / 2, noMsg, true);
     }
   }
 

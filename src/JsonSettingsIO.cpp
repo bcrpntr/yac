@@ -335,6 +335,8 @@ bool JsonSettingsIO::loadWifi(WifiCredentialStore& store, const char* json, bool
     bool ok = false;
     cred.password = obfuscation::deobfuscateFromBase64(obj["password_obf"] | "", &ok);
     if (!ok || cred.password.empty()) {
+      // Fallback for legacy plaintext entries — re-obfuscate on next save.
+      // This is a migration aid; remove once all devices have been migrated.
       cred.password = obj["password"] | std::string("");
       if (!cred.password.empty() && needsResave) *needsResave = true;
     }

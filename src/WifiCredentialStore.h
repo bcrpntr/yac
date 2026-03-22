@@ -18,6 +18,10 @@ bool loadWifi(WifiCredentialStore& store, const char* json, bool* needsResave);
  * Passwords are XOR-obfuscated with the device's unique hardware MAC address
  * and base64-encoded before writing to JSON (not cryptographically secure,
  * but prevents casual reading and ties credentials to the specific device).
+ *
+ * TODO: Replace XOR-obfuscation with a proper AEAD (e.g., AES-256-GCM) using
+ * ESP32's hardware crypto accelerator, or migrate to ESP32's NVS with flash
+ * encryption enabled. Current scheme is vulnerable to trivial extraction.
  */
 class WifiCredentialStore {
  private:

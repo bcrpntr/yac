@@ -1,6 +1,6 @@
 #include "BeeperActivity.h"
 
-#include <ArduinoJson/JsonDocument.h>
+#include <ArduinoJson.h>
 #include <GfxRenderer.h>
 #include <I18n.h>
 

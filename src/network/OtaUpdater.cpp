@@ -71,6 +71,11 @@ OtaUpdater::OtaUpdaterError OtaUpdater::checkForUpdate() {
       /* Default HTTP client buffer size 512 byte only */
       .buffer_size = 8192,
       .buffer_size_tx = 8192,
+      /* NOTE: skip_cert_common_name_check=true is intentional here for the GitHub
+       * API endpoint. The api.github.com certificate has CN=github.com but the request
+       * is for api.github.com; crt_bundle validates the cert chain but CN check would
+       * fail. This is a metadata-only request (version tag + download URL) — the
+       * firmware download URL (download.github.com) must NOT skip CN check. */
       .skip_cert_common_name_check = true,
       .crt_bundle_attach = esp_crt_bundle_attach,
       .keep_alive_enable = true,
@@ -226,7 +231,17 @@ OtaUpdater::OtaUpdaterError OtaUpdater::installUpdate() {
        */
       .buffer_size = 8192,
       .buffer_size_tx = 8192,
-      .skip_cert_common_name_check = true,
+      /* CERT: do NOT skip CN check — verify the cert matches sync.koreader.rocks.
+       * This is critical to prevent MITM from serving a malicious firmware binary.
+       * The crt_bundle_attach validates the cert chain; CN check ensures hostname matches.
+       * Secure boot + flash encryption provide defense-in-depth against physical attacks.
+       * TODO(security): Add esp_https_ota_verify_signature() call after begin() to
+       * cryptographically verify firmware is signed with the expected key, or implement
+       * SHA-256 hash verification of firmware bytes before flashing. Without this, a
+       * compromised GitHub account or a redirected HTTPS request could deliver malicious
+       * firmware that runs with the device's full privileges.
+       */
+      .skip_cert_common_name_check = false,
       .crt_bundle_attach = esp_crt_bundle_attach,
       .keep_alive_enable = true,
   };

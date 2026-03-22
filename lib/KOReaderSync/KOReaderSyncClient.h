@@ -25,7 +25,26 @@ struct KOReaderProgress {
  *
  * Authentication:
  *   x-auth-user: username
- *   x-auth-key: MD5 hash of password
+ *   x-auth-key: MD5 hash of password (computed on-the-fly from stored plaintext)
+ *
+ * Security notes:
+ *   - Credentials are stored in plaintext in /.crosspoint/koreader.json
+ *     (required because MD5 hash must be computed on-the-fly for x-auth-key header).
+ *     Treat the device storage as sensitive — an attacker with file access can
+ *     read the Calibre-Web credentials directly.
+ *   - HTTP Basic Auth header is also sent for Calibre-Web compatibility,
+ *     using base64(username:password) — also plaintext-equivalent.
+ *   - MD5 for auth is used because that's what the KOReader sync server expects;
+ *     it is NOT used for password storage or any cryptographic operation beyond
+ *     a simple authentication token.
+ *   - All communication uses HTTPS (TLS). The ESP32 crt_bundle validates
+ *     the server certificate chain. Hostname verification is performed.
+ *
+ * Conflict resolution:
+ *   - After fetching remote progress, the user is shown both local and remote
+ *     positions and can choose which to apply (interactive resolution).
+ *   - No automatic merge is performed — the user explicitly picks local or remote.
+ *   - On conflict, the device with the furthest progress is pre-selected as default.
  */
 class KOReaderSyncClient {
  public:

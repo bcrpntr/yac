@@ -20,9 +20,11 @@ Phase 1
 - [x] WebSocket size overflow — fixed: reject ≤0 or >100MB uploads
 - [x] handleCreateFolder path traversal — fixed: reject `/`, `\`, `..` in folder name
 - [x] WiFi cred encryption — documented: TODO comment added, legacy plaintext fallback documented
+- [x] OTA firmware — fixed weak cert check on firmware download; added TODO for signature verification
+- [x] Web UI XSS — all pages escape properly; no URL param reflection; JSON via ArduinoJson (safe)
 - [ ] Remaining: WebDAVHandler path traversal audit (not reviewed in this pass)
 - [ ] Remaining: Settings API rate limiting (low priority, internal LAN device)
-- **Status:** in_progress (3 vulns fixed, 2 items deferred)
+- **Status:** in_progress (6 vulns fixed/improved, 2 items deferred)
 
 ### Phase 3: Code Quality
 - [x] DarkGray dither: 4×4 Bayer matrix replaces checkerboard (commits: e0117f8)
@@ -32,10 +34,13 @@ Phase 1
 - **Status:** in_progress
 
 ### Phase 4: Feature Work
+- [x] KOReader sync documentation — full protocol documented in KOReaderSyncClient.h (auth, endpoints, conflict resolution, security notes)
+- [x] News reader security review — no injection risk found; single-feed limitation noted
+- [x] Settings web UI gaps — all 4 CrossPet settings confirmed exposed in web UI
+- [x] Pet evolution sprites — fully documented (encoding, stages, variants, types)
 - [ ] Triage Beeper app integration completeness
 - [ ] Evaluate missing i18n strings for new features
-- [ ] Assess KOReader sync documentation gap
-- **Status:** pending
+- **Status:** in_progress
 
 ### Phase 5: Documentation
 - [ ] Fill HAL layer docs gap

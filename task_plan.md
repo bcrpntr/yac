@@ -43,10 +43,47 @@ Phase 1
 - **Status:** in_progress
 
 ### Phase 5: Documentation
-- [ ] Fill HAL layer docs gap
-- [ ] Document sleep/wake power management
+- [x] Fill HAL layer docs gap — HalPowerManager.h now has full sleep/wake/RTC comment block
+- [x] Document sleep/wake power management — see HalPowerManager.h and findings.md §10
 - [ ] Clarify build/flash process for new contributors
-- **Status:** pending
+- **Status:** in_progress (HAL docs + sleep/wake done)
+
+### Phase 6: SDL_net/Network Audit (this pass)
+- [x] HttpDownloader — setInsecure() TLS gap documented (TODO added)
+- [x] WebDAVHandler — path traversal protection confirmed solid
+- [x] OTAUpdater — CN check enforcement verified
+- [x] No WebDavClient.cpp found in codebase
+- **Status:** completed
+
+### Phase 7: EPUB Internals & SD Cache Documentation
+- [x] EPUB rendering pipeline documented (findings.md §11)
+- [x] SD caching system documented (findings.md §12)
+- [x] Hyphenation algorithm documented (Liang patterns)
+- [x] Image handling on 380KB RAM documented
+- **Status:** completed
+
+### Phase 8: BeeperActivity Review
+- [x] Pagination: missing (50-chat limit, circular wrap, no cursor)
+- [x] Timestamps: raw API string displayed, no formatting
+- [x] Mark as read: not implemented
+- [x] Circular navigation: affects both chat list and message list
+- [ ] Fix: implement cursor-based pagination
+- [ ] Fix: call Beeper "mark as read" API after viewing
+- **Status:** in_progress (gaps documented, fixes pending)
+
+### Phase 9: PetCareTracker / PetEvolution Review
+- [x] No dangerous off-by-one in stat bounds
+- [x] clampSub/clampAdd prevent uint8_t overflow
+- [x] EVOLUTION[] index bug in determineVariant() fixed (deccc19)
+- [x] careMistakes capped at 255 correctly
+- **Status:** completed
+
+### Phase 10: Vulnerability Sweep
+- [x] No unchecked strcpy/sprintf found in network handlers
+- [x] No unchecked atoi/atol on untrusted input found
+- [x] No unvalidated array indices found
+- [x] HttpDownloader setInsecure() documented as known trade-off
+- **Status:** completed
 
 ## Key Questions
 1. What's the build/flash toolchain? (PlatformIO per platformio.ini)

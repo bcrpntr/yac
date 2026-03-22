@@ -426,15 +426,8 @@ void GfxRenderer::drawRoundedRect(const int x, const int y, const int width, con
 namespace {
 // 4×4 Bayer matrix for ordered dithering. Values 0–15; threshold < 8 = black, ≥ 8 = white.
 // Produces smooth 50% gray without the harsh diagonal artifacts of a checkerboard.
-constexpr bool bayer4x4(const int x, const int y) {
-  // Matrix values (access pattern: mat[y % 4][x % 4])
-  //  0  8  2 10
-  // 12  4 14  6
-  //  3 11  1  9
-  // 15  7 13  5
-  static const uint8_t mat[16] = {0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5};
-  return mat[((y & 3) << 2) | (x & 3)] >= 8;
-}
+static const uint8_t bayer4x4_lut[16] = {0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5};
+inline bool bayer4x4(const int x, const int y) { return bayer4x4_lut[((y & 3) << 2) | (x & 3)] >= 8; }
 }  // namespace
 
 void GfxRenderer::fillRect(const int x, const int y, const int width, const int height, const bool state) const {

@@ -702,6 +702,12 @@ void CrossPointWebServer::handleCreateFolder() const {
     return;
   }
 
+  // Security: reject path traversal characters in folder name
+  if (folderName.indexOf('/') >= 0 || folderName.indexOf('\\') >= 0 || folderName.indexOf("..") >= 0) {
+    server->send(400, "text/plain", "Invalid folder name");
+    return;
+  }
+
   // Get parent path
   String parentPath = "/";
   if (server->hasArg("path")) {

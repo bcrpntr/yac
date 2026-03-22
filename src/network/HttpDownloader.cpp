@@ -57,6 +57,11 @@ bool HttpDownloader::fetchUrl(const std::string& url, Stream& outContent) {
   std::unique_ptr<NetworkClient> client;
   if (UrlUtils::isHttpsUrl(url)) {
     auto* secureClient = new NetworkClientSecure();
+    // NOTE: setInsecure() disables certificate chain AND hostname verification.
+    // This is a deliberate trade-off to support self-signed OPDS servers on private
+    // networks. OPDS credentials (Basic Auth) transit in plaintext if TLS is broken.
+    // TODO(security): Implement cert fingerprinting or pinned certificates for OPDS
+    // servers with valid certs; use setInsecure() only as fallback for unknown certs.
     secureClient->setInsecure();
     client.reset(secureClient);
   } else {
@@ -108,6 +113,8 @@ HttpDownloader::DownloadError HttpDownloader::downloadToFile(const std::string& 
   if (UrlUtils::isHttpsUrl(url)) {
     auto* secureClient = new NetworkClientSecure();
     secureClient->setInsecure();
+    // NOTE: setInsecure() disables certificate chain AND hostname verification.
+    // See note in fetchUrl() above for security implications.
     client.reset(secureClient);
   } else {
     client.reset(new NetworkClient());

@@ -3,6 +3,7 @@
 #include <ArduinoJson.h>
 #include <GfxRenderer.h>
 #include <I18n.h>
+#include "network/HttpDownloader.h"
 
 #include "components/UITheme.h"
 #include "CrossPointSettings.h"
@@ -202,7 +203,7 @@ void BeeperActivity::render(RenderLock&&) {
   const int visibleRows = (pageHeight - metrics.topPadding - metrics.headerHeight - metrics.buttonHintsHeight) / rowHeight;
 
   renderer.clearScreen();
-  renderer.drawHeader(renderer, Rect{0, metrics.topPadding, pageWidth, metrics.headerHeight}, tr(STR_BEEPER));
+  GUI.drawHeader(renderer, Rect{0, metrics.topPadding, pageWidth, metrics.headerHeight}, tr(STR_BEEPER));
 
   if (fetchState == FetchState::FETCHING) {
     int tw = renderer.getTextWidth(UI_10_FONT_ID, statusMessage.c_str());

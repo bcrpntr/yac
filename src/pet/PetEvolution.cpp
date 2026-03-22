@@ -7,10 +7,13 @@ namespace {
 
 // Determine reading-based variant at an evolution branching point.
 // Returns 0=Scholar, 1=Balanced, 2=Wild.
-// Called after state.stage is already advanced; prevStageIdx = new stage index - 1.
+// Called after state.stage is already advanced; stageIdx = index of the new stage.
 static uint8_t determineVariant(const PetState& state) {
-  uint8_t prevStageIdx = static_cast<uint8_t>(state.stage) - 1;
-  uint16_t minPages = PetConfig::EVOLUTION[prevStageIdx].minPages;
+  // BUGFIX: use stageIdx (the new stage being entered) to look up the evolution
+  // requirement, not prevStageIdx (the previous stage). prevStageIdx was incorrect
+  // for HATCHLING (stageIdx=1): EVOLUTION[0] vs EVOLUTION[1].
+  uint8_t stageIdx = static_cast<uint8_t>(state.stage);
+  uint16_t minPages = PetConfig::EVOLUTION[stageIdx].minPages;
   uint16_t scholarThreshold = minPages + (minPages / 2);  // 1.5x
 
   // Scholar: active reader with streaks and at least one book finished

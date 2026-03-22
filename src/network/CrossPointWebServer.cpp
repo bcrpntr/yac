@@ -1219,6 +1219,21 @@ void CrossPointWebServer::onWebSocketEvent(uint8_t num, WStype_t type, uint8_t* 
           wsUploadReceived = 0;
           wsUploadStartTime = millis();
 
+          // Security: validate filename (no path traversal characters)
+          if (wsUploadFileName.indexOf("..") >= 0 || wsUploadFileName.indexOf('/') >= 0 ||
+              wsUploadFileName.indexOf('\\') >= 0 || wsUploadFileName.isEmpty()) {
+            wsServer->sendTXT(num, "ERROR:Invalid filename");
+            wsUploadInProgress = false;
+            return;
+          }
+
+          // Security: validate size (reject 0, negative, or absurdly large uploads)
+          if (wsUploadSize <= 0 || wsUploadSize > 100 * 1024 * 1024) {  // max 100 MB
+            wsServer->sendTXT(num, "ERROR:Invalid file size");
+            wsUploadInProgress = false;
+            return;
+          }
+
           // Ensure path is valid
           if (!wsUploadPath.startsWith("/")) wsUploadPath = "/" + wsUploadPath;
           if (wsUploadPath.length() > 1 && wsUploadPath.endsWith("/")) {

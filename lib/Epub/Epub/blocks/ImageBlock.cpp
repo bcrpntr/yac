@@ -41,10 +41,13 @@ bool renderFromCache(GfxRenderer& renderer, const std::string& cachePath, int x,
     return false;
   }
 
-  // Verify dimensions are close (allow 1 pixel tolerance for rounding differences)
+  // Verify dimensions are close (allow generous tolerance for rounding differences from
+  // aspect-ratio-preserving scale calculations). 5px tolerance covers common rounding
+  // differences between integer math in the parser vs. decoder.
+  constexpr int CACHE_TOLERANCE = 5;
   int widthDiff = abs(cachedWidth - expectedWidth);
   int heightDiff = abs(cachedHeight - expectedHeight);
-  if (widthDiff > 1 || heightDiff > 1) {
+  if (widthDiff > CACHE_TOLERANCE || heightDiff > CACHE_TOLERANCE) {
     LOG_ERR("IMG", "Cache dimension mismatch: %dx%d vs %dx%d", cachedWidth, cachedHeight, expectedWidth,
             expectedHeight);
     cacheFile.close();

@@ -315,6 +315,7 @@ void XMLCALL ChapterHtmlSlimParser::startElement(void* userData, const XML_Char*
                       imgStyle.imageWidth.toPixels(emSize, static_cast<float>(self->viewportWidth)) + 0.5f);
                   if (displayHeight < 1) displayHeight = 1;
                   if (displayWidth < 1) displayWidth = 1;
+                  // Clamp to viewport: scale down if either dimension exceeds screen
                   if (displayWidth > self->viewportWidth || displayHeight > self->viewportHeight) {
                     float scaleX = (displayWidth > self->viewportWidth)
                                        ? static_cast<float>(self->viewportWidth) / displayWidth
@@ -328,6 +329,9 @@ void XMLCALL ChapterHtmlSlimParser::startElement(void* userData, const XML_Char*
                     if (displayWidth < 1) displayWidth = 1;
                     if (displayHeight < 1) displayHeight = 1;
                   }
+                  // Ensure both dimensions fit viewport (clamping one may cause the other to exceed)
+                  if (displayWidth > self->viewportWidth) displayWidth = self->viewportWidth;
+                  if (displayHeight > self->viewportHeight) displayHeight = self->viewportHeight;
                   LOG_DBG("EHP", "Display size from CSS height+width: %dx%d", displayWidth, displayHeight);
                 } else if (hasCssHeight && !hasCssWidth && dims.width > 0 && dims.height > 0) {
                   // Use CSS height (resolve % against viewport height) and derive width from aspect ratio
@@ -350,6 +354,8 @@ void XMLCALL ChapterHtmlSlimParser::startElement(void* userData, const XML_Char*
                         static_cast<int>(displayWidth * (static_cast<float>(dims.height) / dims.width) + 0.5f);
                     if (displayHeight < 1) displayHeight = 1;
                   }
+                  // Final safety clamp in case width-clamp caused height to exceed viewport
+                  if (displayHeight > self->viewportHeight) displayHeight = self->viewportHeight;
                   if (displayWidth < 1) displayWidth = 1;
                   LOG_DBG("EHP", "Display size from CSS height: %dx%d", displayWidth, displayHeight);
                 } else if (hasCssWidth && !hasCssHeight && dims.width > 0 && dims.height > 0) {
@@ -367,6 +373,8 @@ void XMLCALL ChapterHtmlSlimParser::startElement(void* userData, const XML_Char*
                         static_cast<int>(displayHeight * (static_cast<float>(dims.width) / dims.height) + 0.5f);
                     if (displayWidth < 1) displayWidth = 1;
                   }
+                  // Final safety clamp in case height-clamp caused width to exceed viewport
+                  if (displayWidth > self->viewportWidth) displayWidth = self->viewportWidth;
                   if (displayHeight < 1) displayHeight = 1;
                   LOG_DBG("EHP", "Display size from CSS width: %dx%d", displayWidth, displayHeight);
                 } else {

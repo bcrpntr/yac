@@ -6,6 +6,8 @@ on:
 jobs:
   build-release-candidate:
     if: startsWith(github.ref_name, 'release/')
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -20,7 +22,9 @@ jobs:
         uses: astral-sh/setup-uv@v7
         with:
           version: "latest"
-          enable-cache: false
+          enable-cache: true
+          cache-dependency-glob: |
+            platformio.ini
 
       - name: Install PlatformIO Core
         run: uv pip install --system -U https://github.com/pioarduino/platformio-core/archive/refs/tags/v6.1.19.zip

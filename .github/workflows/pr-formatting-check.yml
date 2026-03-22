@@ -14,6 +14,8 @@ permissions:
 jobs:
   title-check:
     name: Title Check
+    permissions:
+      statuses: write
     runs-on: ubuntu-latest
     steps:
       - name: Harden Runner

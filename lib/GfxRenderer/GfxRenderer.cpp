@@ -462,7 +462,7 @@ void GfxRenderer::drawPixelDither<Color::White>(const int x, const int y) const 
 
 template <>
 void GfxRenderer::drawPixelDither<Color::LightGray>(const int x, const int y) const {
-  drawPixel(x, y, x % 2 == 0 && y % 2 == 0);
+  drawPixel(x, y, bayer4x4(x, y));
 }
 
 template <>
@@ -598,7 +598,6 @@ void GfxRenderer::drawImage(const uint8_t bitmap[], const int x, const int y, co
     case LandscapeCounterClockwise:
       break;
   }
-  // TODO: Rotate bits
   display.drawImage(bitmap, rotatedX, rotatedY, width, height);
 }
 

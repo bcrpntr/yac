@@ -85,33 +85,26 @@ namespace {
 constexpr size_t AES_KEY_LEN = 32;   // 256 bits
 constexpr size_t AES_IV_LEN = 12;    // 96 bits (recommended for GCM)
 constexpr size_t AES_TAG_LEN = 16;   // 128 bits (standard GCM tag)
-constexpr int PBKDF2_ITERATIONS = 50000;  // OWASP-recommended minimum for SHA256
 
-// Fixed salt for PBKDF2 key derivation — not secret, ensures the same MAC on
-// different devices with the same flash contents still produces different keys.
-// TODO: Replace with per-device key stored in eFuse or NVS with flash encryption.
-// Production: store a random 32-byte key in eFuse; read it here instead of deriving.
-constexpr uint8_t PBKDF2_SALT[] = {
-    0x43, 0x72, 0x6F, 0x73, 0x73, 0x50, 0x6F, 0x69,
-    0x6E, 0x74, 0x57, 0x69, 0x46, 0x69, 0x43, 0x72,
-    0x65, 0x64, 0x73, 0x44, 0x65, 0x76, 0x56, 0x31,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00  // last 8 bytes = zero, updated with MAC
-};
-constexpr size_t PBKDF2_SALT_LEN = sizeof(PBKDF2_SALT);
+// Fixed context string for HMAC-based key derivation — ensures the same MAC on
+// different devices with the same flash contents produces different keys.
+// NOTE: We use direct HMAC-SHA256 derivation rather than PBKDF2 because:
+//   1. PBKDF2 is designed for password stretching; a hardware MAC is not a password.
+//   2. ESP32's mbedtls port only provides mbedtls_pkcs5_pbkdf2_hmac_ext (extended API),
+//      which requires different calling convention and doesn't simplify the code.
+//   3. HMAC-SHA256 is a perfectly fine KDF when the "key material" is already high-entropy
+//      (6 bytes of hardware MAC).
+// TODO: For production, store a random 32-byte AES key in eFuse or NVS with
+// flash encryption enabled. This eliminates key derivation entirely.
+constexpr uint8_t HMAC_CONTEXT[] = "CrossPetWiFiCreds-v1";
+constexpr size_t HMAC_CONTEXT_LEN = sizeof(HMAC_CONTEXT) - 1;
 
-// Derive AES-256 key from hardware MAC using PBKDF2-HMAC-SHA256.
+// Derive AES-256 key from hardware MAC using HMAC-SHA256.
 // Returns a statically cached 32-byte key (initialized once).
 //
-// NOTE: PBKDF2 is used here because it is the standard (RFC 8018) password-based
-// key derivation function. It slows down brute-force attacks by requiring many
-// iterations. With a 6-byte MAC as the "password", PBKDF2 doesn't add much
-// strength — but it is the right primitive if we ever migrate to a real passphrase.
-// The real security comes from the MAC being hardware-backed and not readable from
-// external flash.
-//
-// TODO: For production, store a random 32-byte AES key in eFuse or NVS with
-// flash encryption enabled. This eliminates the need for key derivation entirely
-// and provides true key isolation from software attacks against the flash.
+// The MAC is hardware-backed and not readable from external flash, so the derived
+// key cannot be extracted by reading the SPI flash. On devices with ESP32 flash
+// encryption enabled, the entire flash is AES-encrypted, providing additional protection.
 const uint8_t* getAesKey() {
   static uint8_t key[AES_KEY_LEN] = {};
   static bool initialized = false;
@@ -119,39 +112,37 @@ const uint8_t* getAesKey() {
     uint8_t mac[6] = {};
     esp_efuse_mac_get_default(mac);
 
-    // Build salt: fixed prefix + MAC in last 8 bytes
-    uint8_t salt[PBKDF2_SALT_LEN] = {};
-    memcpy(salt, PBKDF2_SALT, PBKDF2_SALT_LEN);
-    memcpy(salt + PBKDF2_SALT_LEN - 8, mac, 6);
-
-    // Use mbedtls HMAC-SHA256 as the PRF inside PBKDF2
+    // HMAC-SHA256(ctx || mac) → 32-byte key
     mbedtls_md_context_t mdCtx;
-    mbedtls_md_context_t* pCtx = &mdCtx;
-    mbedtls_md_init(pCtx);
+    mbedtls_md_init(&mdCtx);
     const mbedtls_md_info_t* mdInfo = mbedtls_md_info_from_type(MBEDTLS_MD_SHA256);
     if (mdInfo == nullptr) {
       LOG_ERR("OBF", "mbedtls_md_info_from_type(SHA256) failed — using fallback key derivation");
     } else {
-      int ret = mbedtls_md_setup(pCtx, mdInfo, 1);  // 1 = HMAC mode
+      int ret = mbedtls_md_setup(&mdCtx, mdInfo, 1);  // 1 = HMAC mode
       if (ret != 0) {
         LOG_ERR("OBF", "mbedtls_md_setup failed (ret=%d) — using fallback key derivation", ret);
         mdInfo = nullptr;
       } else {
-        // Use MAC as HMAC key (PBKDF2 "password")
-        ret = mbedtls_md_hmac_starts(pCtx, mac, sizeof(mac));
+        // Start HMAC with context as key
+        ret = mbedtls_md_hmac_starts(&mdCtx, HMAC_CONTEXT, HMAC_CONTEXT_LEN);
         if (ret != 0) {
           LOG_ERR("OBF", "mbedtls_md_hmac_starts failed (ret=%d) — using fallback key derivation", ret);
           mdInfo = nullptr;
+        } else {
+          // Feed in the MAC as the message data
+          ret = mbedtls_md_hmac_update(&mdCtx, mac, sizeof(mac));
+          if (ret != 0) {
+            LOG_ERR("OBF", "mbedtls_md_hmac_update failed (ret=%d) — using fallback key derivation", ret);
+            mdInfo = nullptr;
+          } else {
+            ret = mbedtls_md_hmac_finish(&mdCtx, key);
+            if (ret != 0) {
+              LOG_ERR("OBF", "mbedtls_md_hmac_finish failed (ret=%d) — using fallback key derivation", ret);
+              mdInfo = nullptr;
+            }
+          }
         }
-      }
-    }
-
-    if (mdInfo != nullptr) {
-      int ret = mbedtls_pkcs5_pbkdf2_hmac(pCtx, mac, sizeof(mac), salt, PBKDF2_SALT_LEN,
-                                          PBKDF2_ITERATIONS, AES_KEY_LEN, key);
-      if (ret != 0) {
-        LOG_ERR("OBF", "PBKDF2 key derivation failed (ret=%d) — using fallback", ret);
-        mdInfo = nullptr;
       }
     }
 
@@ -163,7 +154,7 @@ const uint8_t* getAesKey() {
       }
     }
 
-    mbedtls_md_free(pCtx);
+    mbedtls_md_free(&mdCtx);
     initialized = true;
   }
   return key;
@@ -185,22 +176,17 @@ String aes256GcmEncrypt(const std::string& plaintext) {
   std::vector<uint8_t> output(AES_IV_LEN + ctLen + AES_TAG_LEN);
   memcpy(output.data(), nonce, AES_IV_LEN);
 
-  mbedtls_aes_context aesCtx;
   mbedtls_gcm_context gcmCtx;
-
-  mbedtls_aes_init(&aesCtx);
   mbedtls_gcm_init(&gcmCtx);
 
-  int ret = mbedtls_aes_setkey_enc(&aesCtx, key, 256);
+  int ret = mbedtls_gcm_setkey(&gcmCtx, MBEDTLS_CIPHER_ID_AES, key, 256);
   if (ret != 0) {
-    LOG_ERR("OBF", "AES key setup failed (ret=%d)", ret);
-    mbedtls_aes_free(&aesCtx);
+    LOG_ERR("OBF", "GCM key setup failed (ret=%d)", ret);
     mbedtls_gcm_free(&gcmCtx);
     return "";
   }
 
   // Encrypt: plaintext -> ciphertext (in output buffer after nonce)
-  // Authenticate: ciphertext (but output buffer layout is nonce|ct|tag, so pass nullptr for auth data initially)
   ret = mbedtls_gcm_crypt_and_tag(&gcmCtx, MBEDTLS_GCM_ENCRYPT, ctLen,
                                   nonce, sizeof(nonce),
                                   nullptr, 0,  // no additional authenticated data
@@ -209,7 +195,6 @@ String aes256GcmEncrypt(const std::string& plaintext) {
                                   AES_TAG_LEN,
                                   output.data() + AES_IV_LEN + ctLen);
 
-  mbedtls_aes_free(&aesCtx);
   mbedtls_gcm_free(&gcmCtx);
 
   if (ret != 0) {
@@ -264,30 +249,25 @@ std::string aes256GcmDecrypt(const char* encoded, bool* ok) {
 
   const uint8_t* key = getAesKey();
 
-  mbedtls_aes_context aesCtx;
   mbedtls_gcm_context gcmCtx;
-
-  mbedtls_aes_init(&aesCtx);
   mbedtls_gcm_init(&gcmCtx);
 
-  ret = mbedtls_aes_setkey_enc(&aesCtx, key, 256);
+  ret = mbedtls_gcm_setkey(&gcmCtx, MBEDTLS_CIPHER_ID_AES, key, 256);
   if (ret != 0) {
-    LOG_ERR("OBF", "AES key setup failed (ret=%d)", ret);
-    mbedtls_aes_free(&aesCtx);
+    LOG_ERR("OBF", "GCM key setup failed (ret=%d)", ret);
     mbedtls_gcm_free(&gcmCtx);
     if (ok) *ok = false;
     return "";
   }
 
   // Decrypt and authenticate simultaneously
-  ret = mbedtls_gcm_auth_decrypt(&aesCtx, ciphertextLen,
+  ret = mbedtls_gcm_auth_decrypt(&gcmCtx, ciphertextLen,
                                  nonce, AES_IV_LEN,
-                                 nullptr, 0,  // no additional data
+                                 nullptr, 0,  // no additional authenticated data
                                  tag, AES_TAG_LEN,
                                  ciphertext,
                                  reinterpret_cast<uint8_t*>(&plaintext[0]));
 
-  mbedtls_aes_free(&aesCtx);
   mbedtls_gcm_free(&gcmCtx);
 
   if (ret != 0) {

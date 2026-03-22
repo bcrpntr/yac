@@ -307,7 +307,10 @@ bool JsonSettingsIO::saveWifi(const WifiCredentialStore& store, const char* path
   for (const auto& cred : store.getCredentials()) {
     JsonObject obj = arr.add<JsonObject>();
     obj["ssid"] = cred.ssid;
-    obj["password_obf"] = obfuscation::obfuscateToBase64(cred.password);
+    // AES-256-GCM: provides authenticated encryption (confidentiality + integrity).
+    // Format: base64(nonce || ciphertext || auth_tag)
+    // Falls back to legacy XOR-obfuscated form for existing credentials on read.
+    obj["password_enc"] = obfuscation::aes256GcmEncrypt(cred.password);
   }
 
   String json;
@@ -332,12 +335,16 @@ bool JsonSettingsIO::loadWifi(WifiCredentialStore& store, const char* json, bool
     if (store.credentials.size() >= store.MAX_NETWORKS) break;
     WifiCredential cred;
     cred.ssid = obj["ssid"] | std::string("");
+
+    // Priority: AES-GCM (password_enc) > legacy XOR (password_obf) > plaintext (password)
     bool ok = false;
-    cred.password = obfuscation::deobfuscateFromBase64(obj["password_obf"] | "", &ok);
+    cred.password = obfuscation::aes256GcmDecrypt(obj["password_enc"] | "", &ok);
     if (!ok || cred.password.empty()) {
-      // Fallback for legacy plaintext entries — re-obfuscate on next save.
-      // This is a migration aid; remove once all devices have been migrated.
-      cred.password = obj["password"] | std::string("");
+      // Migrate from legacy XOR-obfuscated or plaintext password to AES-GCM on next save
+      cred.password = obfuscation::deobfuscateFromBase64(obj["password_obf"] | "", &ok);
+      if (!ok || cred.password.empty()) {
+        cred.password = obj["password"] | std::string("");
+      }
       if (!cred.password.empty() && needsResave) *needsResave = true;
     }
     store.credentials.push_back(cred);

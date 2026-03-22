@@ -15,13 +15,17 @@ bool loadWifi(WifiCredentialStore& store, const char* json, bool* needsResave);
 
 /**
  * Singleton class for storing WiFi credentials on the SD card.
- * Passwords are XOR-obfuscated with the device's unique hardware MAC address
- * and base64-encoded before writing to JSON (not cryptographically secure,
- * but prevents casual reading and ties credentials to the specific device).
  *
- * TODO: Replace XOR-obfuscation with a proper AEAD (e.g., AES-256-GCM) using
- * ESP32's hardware crypto accelerator, or migrate to ESP32's NVS with flash
- * encryption enabled. Current scheme is vulnerable to trivial extraction.
+ * Passwords are encrypted with AES-256-GCM using a per-device key derived
+ * from the hardware MAC via PBKDF2-HMAC-SHA256. The encryption provides
+ * both confidentiality and authentication (tamper detection).
+ *
+ * Key storage: currently derived from MAC (see ObfuscationUtils). For production,
+ * store a random 32-byte key in eFuse or NVS with ESP32 flash encryption enabled.
+ *
+ * JSON field: `password_enc` = base64(nonce || ciphertext || GCM tag).
+ * Legacy `password_obf` (XOR + base64) and `password` (plaintext) fields are
+ * still accepted for migration from older firmware versions.
  */
 class WifiCredentialStore {
  private:

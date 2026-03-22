@@ -408,6 +408,11 @@ void CrossPointWebServer::handleFileListData() const {
     if (currentPath.length() > 1 && currentPath.endsWith("/")) {
       currentPath = currentPath.substring(0, currentPath.length() - 1);
     }
+    // Reject path traversal attempts (e.g. /../foo or /foo/../bar)
+    if (currentPath.indexOf("..") >= 0) {
+      server->send(400, "text/plain", "Invalid path");
+      return;
+    }
   }
 
   bool showHidden = false;
@@ -458,13 +463,10 @@ void CrossPointWebServer::handleDownload() const {
     return;
   }
 
-  String itemPath = server->arg("path");
+  String itemPath = normalizeWebPath(server->arg("path"));
   if (itemPath.isEmpty() || itemPath == "/") {
     server->send(400, "text/plain", "Invalid path");
     return;
-  }
-  if (!itemPath.startsWith("/")) {
-    itemPath = "/" + itemPath;
   }
 
   const String itemName = itemPath.substring(itemPath.lastIndexOf('/') + 1);
@@ -568,15 +570,7 @@ void CrossPointWebServer::handleUpload(UploadState& state) const {
     // Note: We use query parameter instead of form data because multipart form
     // fields aren't available until after file upload completes
     if (server->hasArg("path")) {
-      state.path = server->arg("path");
-      // Ensure path starts with /
-      if (!state.path.startsWith("/")) {
-        state.path = "/" + state.path;
-      }
-      // Remove trailing slash unless it's root
-      if (state.path.length() > 1 && state.path.endsWith("/")) {
-        state.path = state.path.substring(0, state.path.length() - 1);
-      }
+      state.path = normalizeWebPath(server->arg("path"));
     } else {
       state.path = "/";
     }
@@ -711,13 +705,7 @@ void CrossPointWebServer::handleCreateFolder() const {
   // Get parent path
   String parentPath = "/";
   if (server->hasArg("path")) {
-    parentPath = server->arg("path");
-    if (!parentPath.startsWith("/")) {
-      parentPath = "/" + parentPath;
-    }
-    if (parentPath.length() > 1 && parentPath.endsWith("/")) {
-      parentPath = parentPath.substring(0, parentPath.length() - 1);
-    }
+    parentPath = normalizeWebPath(server->arg("path"));
   }
 
   // Build full folder path
@@ -954,10 +942,8 @@ void CrossPointWebServer::handleDelete() const {
       continue;
     }
 
-    // Ensure path starts with /
-    if (!itemPath.startsWith("/")) {
-      itemPath = "/" + itemPath;
-    }
+    // Normalize path and ensure it starts with /
+    itemPath = normalizeWebPath(itemPath);
 
     // Security check: prevent deletion of protected items
     const String itemName = itemPath.substring(itemPath.lastIndexOf('/') + 1);

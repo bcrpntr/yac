@@ -332,7 +332,8 @@ void setup() {
   }
 
   HalSystem::checkPanic();
-  HalSystem::clearPanic();  // TODO: move this to an activity when we have one to display the panic info
+  // TODO: If panic was detected, display panic info in an activity before clearing
+  HalSystem::clearPanic();
 
   SETTINGS.loadFromFile();
   PET_SETTINGS.loadFromFile();

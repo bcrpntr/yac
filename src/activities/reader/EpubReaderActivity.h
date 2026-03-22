@@ -30,6 +30,7 @@ class EpubReaderActivity final : public Activity {
   bool automaticPageTurnActive = false;
   bool bookCompletionNotified = false;
   bool ignoreFrontButtons = false;
+  int pageLoadRetryCount = 0;  // Prevents infinite loop when a page keeps failing to load
 
   // Chapter completion celebration (Phase 2)
   int lastCompletedSpineIndex = -1;   // prevents double-fire on back-then-forward

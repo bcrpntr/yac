@@ -54,8 +54,7 @@ class Activity {
   // Finish this activity and return to the previous one on the stack (if any)
   void finish();
 
-  // Convenience method to facilitate API transition to ActivityManager
-  // TODO: remove this in near future
+  // Convenience methods that delegate to ActivityManager
   void onGoHome();
   void onSelectBook(const std::string& path);
 };

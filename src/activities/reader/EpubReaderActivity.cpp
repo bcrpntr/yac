@@ -908,14 +908,26 @@ void EpubReaderActivity::render(RenderLock&& lock) {
   {
     auto p = section->loadPageFromSectionFile();
     if (!p) {
-      LOG_ERR("ERS", "Failed to load page from SD - clearing section cache");
+      pageLoadRetryCount++;
+      if (pageLoadRetryCount > 3) {
+        LOG_ERR("ERS", "Page failed to load after 3 attempts - giving up");
+        renderer.clearScreen();
+        renderer.drawCenteredText(UI_12_FONT_ID, 300, tr(STR_PAGE_LOAD_ERROR), true, EpdFontFamily::BOLD);
+        renderStatusBar();
+        renderer.displayBuffer();
+        automaticPageTurnActive = false;
+        pageLoadRetryCount = 0;
+        return;
+      }
+      LOG_ERR("ERS", "Failed to load page from SD - clearing section cache (attempt %d)", pageLoadRetryCount);
       section->clearCache();
       section.reset();
       requestUpdate();  // Try again after clearing cache
-                        // TODO: prevent infinite loop if the page keeps failing to load for some reason
       automaticPageTurnActive = false;
       return;
     }
+    // Success - reset retry counter
+    pageLoadRetryCount = 0;
 
     // Collect footnotes from the loaded page
     currentPageFootnotes = std::move(p->footnotes);
@@ -1033,8 +1045,7 @@ void EpubReaderActivity::renderContents(std::unique_ptr<Page> page, const int or
   // Save bw buffer to reset buffer state after grayscale data sync
   renderer.storeBwBuffer();
 
-  // grayscale rendering
-  // TODO: Only do this if font supports it
+  // grayscale rendering — anti-aliasing is applied when enabled in settings
   if (SETTINGS.textAntiAliasing) {
     renderer.clearScreen(0x00);
     renderer.setRenderMode(GfxRenderer::GRAYSCALE_LSB);

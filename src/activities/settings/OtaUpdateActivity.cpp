@@ -139,7 +139,7 @@ void OtaUpdateActivity::render(RenderLock&&) {
 }
 
 void OtaUpdateActivity::loop() {
-  // TODO @ngxson : refactor this logic later
+  // Poll render flag and request update if needed
   if (updater.getRender()) {
     requestUpdate();
   }

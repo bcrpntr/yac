@@ -1430,6 +1430,7 @@ const char* const STRINGS_EN[] = {
     "Book's Style",
     "Embedded Style",
     "OPDS Server URL",
+    "Beeper API URL",
     "Footnotes",
     "No footnotes on this page",
     "[link]",
@@ -2398,6 +2399,7 @@ const char* const STRINGS_ES[] = {
     "Estilo del libro",
     "Estilo integrado",
     "URL del servidor OPDS",
+    "Beeper API URL",
     "Pie de p\xC3"
     "\xA1"
     "gina",
@@ -3515,6 +3517,7 @@ const char* const STRINGS_FR[] = {
     "\xA9"
     "",
     "URL serveur OPDS",
+    "Beeper API URL",
     "Footnotes",
     "No footnotes on this page",
     "[link]",
@@ -4387,6 +4390,7 @@ const char* const STRINGS_DE[] = {
     "Buch-Stil",
     "Eingebetteter Stil",
     "OPDS-Server-URL",
+    "Beeper API URL",
     "Fu\xC3"
     "\x9F"
     "noten",
@@ -6381,6 +6385,7 @@ const char* const STRINGS_CS[] = {
     "\xBD"
     " styl",
     "URL serveru OPDS",
+    "Beeper API URL",
     "Footnotes",
     "No footnotes on this page",
     "[link]",
@@ -7394,6 +7399,7 @@ const char* const STRINGS_PO[] = {
     "Estilo do livro",
     "Estilo embutido",
     "URL do servidor OPDS",
+    "Beeper API URL",
     "Footnotes",
     "No footnotes on this page",
     "[link]",
@@ -16460,6 +16466,7 @@ const char* const STRINGS_RU[] = {
     "\xD0"
     "\xB0"
     "",
+    "Beeper API URL",
     "Footnotes",
     "No footnotes on this page",
     "[link]",
@@ -17712,6 +17719,7 @@ const char* const STRINGS_SV[] = {
     "\xA4"
     "ddad stil",
     "OPDS-serveradress",
+    "Beeper API URL",
     "Fotnoter",
     "Inga fotnoter p\xC3"
     "\xA5"
@@ -19106,6 +19114,7 @@ const char* const STRINGS_RO[] = {
     "\xAE"
     "ncorporat",
     "URL server OPDS",
+    "Beeper API URL",
     "Note de subsol",
     "Nicio not\xC4"
     "\x83"
@@ -20126,6 +20135,7 @@ const char* const STRINGS_CA[] = {
     "Estil del llibre",
     "Estil incrustat",
     "URL del servidor OPDS",
+    "Beeper API URL",
     "Notes al peu",
     "No hi ha notes al peu en aquesta p\xC3"
     "\xA0"
@@ -30306,6 +30316,7 @@ const char* const STRINGS_UK[] = {
     "\xD0"
     "\xB0"
     " OPDS",
+    "Beeper API URL",
     "\xD0"
     "\x97"
     "\xD0"
@@ -39226,6 +39237,7 @@ const char* const STRINGS_BE[] = {
     "\xD0"
     "\xB0"
     "",
+    "Beeper API URL",
     "Footnotes",
     "No footnotes on this page",
     "[link]",
@@ -40005,6 +40017,7 @@ const char* const STRINGS_IT[] = {
     "Stile del Libro",
     "Stile Integrato",
     "URL del Server OPDS",
+    "Beeper API URL",
     "Footnotes",
     "No footnotes on this page",
     "[link]",
@@ -41413,6 +41426,7 @@ const char* const STRINGS_PL[] = {
     "ki",
     "Style wbudowane w EPUB",
     "URL serwera OPDS",
+    "Beeper API URL",
     "Przypisy",
     "Brak przypis\xC3"
     "\xB3"
@@ -42595,6 +42609,7 @@ const char* const STRINGS_FI[] = {
     "Kirjan tyyli",
     "Upotettu tyyli",
     "OPDS-palvelimen osoite",
+    "Beeper API URL",
     "Footnotes",
     "No footnotes on this page",
     "[link]",
@@ -43533,6 +43548,7 @@ const char* const STRINGS_DA[] = {
     "Bogens stil",
     "Indlejret stil",
     "OPDS Server URL",
+    "Beeper API URL",
     "Footnotes",
     "No footnotes on this page",
     "[link]",
@@ -44243,6 +44259,7 @@ const char* const STRINGS_NL[] = {
     "Stijl van boek",
     "Ingebedde stijl",
     "OPDS-server URL",
+    "Beeper API URL",
     "Voetnoten",
     "Geen voetnoten op deze pagina",
     "[link]",
@@ -45993,6 +46010,7 @@ const char* const STRINGS_TR[] = {
     "\xBC"
     " Stil",
     "OPDS Sunucu Adresi",
+    "Beeper API URL",
     "Dipnotlar",
     "Bu sayfada dipnot yok",
     "[ba\xC4"
@@ -49302,6 +49320,7 @@ const char* const STRINGS_VI[] = {
     "\xBB"
     "\xA7"
     " OPDS",
+    "Beeper API URL",
     "Ch\xC3"
     "\xBA"
     " th\xC3"

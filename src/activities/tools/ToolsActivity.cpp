@@ -15,12 +15,13 @@
 #include "WeatherActivity.h"
 #include "ReadingStatsActivity.h"
 #include "SleepImagePickerActivity.h"
+#include "BeeperActivity.h"
 #include "activities/browser/OpdsBookBrowserActivity.h"
 #include "components/UITheme.h"
 #include "CrossPointSettings.h"
 #include "fontIds.h"
 
-static constexpr int BASE_MENU_COUNT = 12;  // File Transfer added to Apps
+static constexpr int BASE_MENU_COUNT = 13;  // File Transfer + Beeper
 
 int ToolsActivity::getMenuCount() const {
   return BASE_MENU_COUNT + (SETTINGS.opdsServerUrl[0] ? 1 : 0);
@@ -66,15 +67,18 @@ void ToolsActivity::loop() {
       case 6:
         activityManager.pushActivity(std::make_unique<SleepImagePickerActivity>(renderer, mappedInput));
         break;
+      case 7:
+        activityManager.pushActivity(std::make_unique<BeeperActivity>(renderer, mappedInput));
+        break;
       default: {
         // Dynamic items: OPDS (if configured) then games
-        int gameBase = 7;  // After 7 base items (0-6)
+        int gameBase = 8;  // After 8 base items (0-7)
         if (SETTINGS.opdsServerUrl[0]) {
-          if (selectorIndex == 7) {
+          if (selectorIndex == 8) {
             activityManager.pushActivity(std::make_unique<OpdsBookBrowserActivity>(renderer, mappedInput));
             break;
           }
-          gameBase = 8;
+          gameBase = 9;
         }
         int gameIdx = selectorIndex - gameBase;
         switch (gameIdx) {
@@ -103,23 +107,22 @@ void ToolsActivity::render(RenderLock&&) {
 
   GUI.drawHeader(renderer, Rect{0, metrics.topPadding, pageWidth, metrics.headerHeight}, tr(STR_TOOLS));
 
-  // Build menu labels — OPDS inserted at index 8 when configured
+  // Build menu labels — OPDS inserted at index 9 when configured
   const char* baseLabels[] = {
       tr(STR_FILE_TRANSFER),
       tr(STR_CLOCK), tr(STR_WEATHER), tr(STR_POMODORO), tr(STR_VIRTUAL_PET),
-      tr(STR_READING_STATS_APP), tr(STR_SLEEP_IMAGE_PICKER)};
+      tr(STR_READING_STATS_APP), tr(STR_SLEEP_IMAGE_PICKER), "Beeper"};
   const char* gameLabels[] = {
       tr(STR_CHESS), tr(STR_CARO), tr(STR_SUDOKU), tr(STR_MINESWEEPER), tr(STR_2048)};
   const bool hasOpds = SETTINGS.opdsServerUrl[0] != '\0';
   const int menuCount = getMenuCount();
-
   const int menuTop = metrics.topPadding + metrics.headerHeight + metrics.verticalSpacing;
   const int menuHeight = pageHeight - menuTop - metrics.buttonHintsHeight - metrics.verticalSpacing;
 
   GUI.drawList(renderer, Rect{0, menuTop, pageWidth, menuHeight}, menuCount, selectorIndex,
                [&](int index) -> std::string {
-                 if (index < 7) return baseLabels[index];
-                 int dynamicIdx = index - 7;
+                 if (index < 8) return baseLabels[index];
+                 int dynamicIdx = index - 8;
                  if (hasOpds) {
                    if (dynamicIdx == 0) return tr(STR_OPDS_BROWSER);
                    dynamicIdx--;

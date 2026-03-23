@@ -1040,6 +1040,9 @@ void CrossPointWebServer::handleGetSettings() const {
         doc["type"] = "toggle";
         if (s.valuePtr) {
           doc["value"] = static_cast<int>(SETTINGS.*(s.valuePtr));
+        } else if (s.valueGetter) {
+          // DynamicToggle: valuePtr is nullptr, use valueGetter
+          doc["value"] = static_cast<int>(s.valueGetter());
         }
         break;
       }
@@ -1072,6 +1075,9 @@ void CrossPointWebServer::handleGetSettings() const {
           doc["value"] = s.stringGetter();
         } else if (s.stringOffset > 0) {
           doc["value"] = reinterpret_cast<const char*>(&SETTINGS) + s.stringOffset;
+        } else {
+          // Fallback: empty string if neither getter nor offset is available
+          doc["value"] = "";
         }
         break;
       }
@@ -1124,8 +1130,11 @@ void CrossPointWebServer::handlePostSettings() {
         const int val = doc[s.key].as<int>() ? 1 : 0;
         if (s.valuePtr) {
           SETTINGS.*(s.valuePtr) = val;
+          applied++;
+        } else if (s.valueSetter) {
+          s.valueSetter(static_cast<uint8_t>(val));
+          applied++;
         }
-        applied++;
         break;
       }
       case SettingType::ENUM: {
